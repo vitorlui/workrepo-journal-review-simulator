@@ -6,6 +6,7 @@ appends to the per-review audit log. The MVP runs synchronously in-process.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -372,5 +373,54 @@ def run_pipeline(review_id: str, mode: str) -> PipelineResult:
             _do_export(review_id, result)
 
     _set_status(review_id, f"done:{mode}")
+    _update_meta_status(review_id, mode)
     _audit(review_id, f"pipeline mode '{mode}' completed")
     return result
+
+
+def _extract_decision(review_id: str) -> str | None:
+    """Best-effort parse of the editor's final decision from editor_decision.md."""
+    p = review_dir(review_id) / "editor" / "editor_decision.md"
+    if not p.exists():
+        return None
+    text = read_text(p).lower()
+    m = re.search(r"##\s*decision(.{0,500})", text, re.S)
+    seg = m.group(1) if m else ""
+    if not seg or "needs_user_input" in seg[:120]:
+        return None  # template scaffold — no real decision yet
+    for d in ("desk reject", "major revision", "minor revision", "accept", "reject"):
+        if d in seg:
+            return d
+    return None
+
+
+def _update_meta_status(review_id: str, mode: str) -> None:
+    """Reflect pipeline progress in metadata.yaml (drives the UI status)."""
+    meta = _load_meta(review_id)
+    step_for_mode = {
+        "extract": 2, "classify": 3, "discover_venues": 4, "venue_fit": 4,
+        "generate_external_prompts": 7, "review": 9, "specialized_review": 9,
+        "integrity": 10, "editorial_decision": 11, "export": 13, "full_review": 13,
+    }.get(mode)
+    if step_for_mode is not None:
+        meta["current_step"] = max(int(meta.get("current_step", 0) or 0), step_for_mode)
+    if mode in ("full_review", "export", "editorial_decision"):
+        meta["status"] = "completed"
+        dec = _extract_decision(review_id)
+        if dec:
+            meta["final_decision"] = dec
+    else:
+        meta["status"] = f"done:{mode}"
+    _save_meta(review_id, meta)
+    # Mirror final_decision into the DB.
+    try:
+        from sqlalchemy import select
+        from worker.db import Review, session_scope
+        with session_scope() as s:
+            r = s.scalar(select(Review).where(Review.review_id == review_id))
+            if r is not None:
+                if meta.get("final_decision"):
+                    r.final_decision = meta["final_decision"]
+                r.current_step = meta.get("current_step", r.current_step)
+    except Exception:
+        pass
