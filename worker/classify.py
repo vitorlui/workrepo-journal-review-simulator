@@ -115,25 +115,42 @@ class Classification:
         }
 
 
+# Max number of areas to report (avoids over-tagging).
+MAX_AREAS = 3
+# Min distinct keywords for an area to count as "strong".
+MIN_KEYWORDS = 2
+
+
+def _matches(low: str, kw: str) -> bool:
+    """Whole-token match: 'cer' must NOT match inside 'cereal'/'concern'."""
+    pat = r"(?<![a-z0-9])" + re.escape(kw.lower()) + r"(?![a-z0-9])"
+    return re.search(pat, low) is not None
+
+
 def classify_text(text: str) -> Classification:
     low = (text or "").lower()
-    scores: dict[str, int] = {}
-    families: set[int] = set()
 
+    # Count DISTINCT keyword hits per area, using whole-token matching.
+    raw: dict[str, int] = {}
     for area_key, spec in AREA_KEYWORDS.items():
-        count = 0
-        for kw in spec["keywords"]:
-            count += len(re.findall(re.escape(kw), low))
-        if count > 0:
-            scores[area_key] = count
-            families.update(spec["families"])
+        hits = sum(1 for kw in spec["keywords"] if _matches(low, kw))
+        if hits:
+            raw[area_key] = hits
 
-    detected = sorted(scores, key=lambda k: scores[k], reverse=True)
+    # Prefer areas with >=2 distinct keywords; fall back to single-hit areas only
+    # if nothing is strong, so we still classify niche papers.
+    strong = {k: v for k, v in raw.items() if v >= MIN_KEYWORDS}
+    chosen = strong or raw
+
+    detected = sorted(chosen, key=lambda k: chosen[k], reverse=True)[:MAX_AREAS]
     labels = [AREA_KEYWORDS[k]["label"] for k in detected]
+    families: set[int] = set()
+    for k in detected:
+        families.update(AREA_KEYWORDS[k]["families"])
 
     paper_type = "UNKNOWN"
     for hints, ptype in PAPER_TYPE_HINTS:
-        if any(h in low for h in hints):
+        if any(_matches(low, h) for h in hints):
             paper_type = ptype
             break
     if paper_type == "UNKNOWN" and detected:
@@ -144,5 +161,5 @@ def classify_text(text: str) -> Classification:
         detected_area_labels=labels,
         paper_type=paper_type,
         likely_venue_families=sorted(families),
-        scores=scores,
+        scores={k: chosen[k] for k in detected},
     )

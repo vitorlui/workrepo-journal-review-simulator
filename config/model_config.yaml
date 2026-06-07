@@ -46,7 +46,7 @@ cli_engines:
     bin: claude
     cmd: ["claude", "-p"]      # Claude Code non-interactive print mode
     pass_via: stdin
-    timeout: 600
+    timeout: 300
   codex:
     bin: codex
     cmd: ["codex", "exec"]     # OpenAI Codex CLI (ChatGPT) non-interactive
