@@ -33,6 +33,21 @@ export default function ReviewWizard({ params }: { params: { id: string } }) {
   useEffect(() => { refresh(); }, [refresh]);
 
   async function run(mode: string) {
+    // Guard: re-running a review-generating step over an already-generated
+    // review overwrites real content. Require TWO confirmations.
+    const generated =
+      review?.status === "completed" || Number(review?.current_step ?? 0) >= 9;
+    const regenerates = [
+      "full_review", "review", "specialized_review", "editorial_decision", "integrity",
+    ].includes(mode);
+    if (generated && regenerates) {
+      if (!window.confirm(
+        `This review already has results. Re-running "${mode}" will OVERWRITE the current reviewer/editor content. Continue?`
+      )) return;
+      if (!window.confirm(
+        `Confirm again — regenerate "${mode}" and overwrite the existing results? This cannot be undone.`
+      )) return;
+    }
     setBusy(true); setMsg(`Running ${mode}...`);
     try {
       const r = await api.runPipeline(id, mode);
