@@ -1,10 +1,14 @@
 """The reviewer/editor/integrity execution seam.
 
-For the MVP the default engine is ``template``: deterministic, offline Markdown
-scaffolding built from the extracted paper + venue + reviewer profile. Every
-output carries the mandatory metadata block (engine, model, mode, sources,
-limitations, confidence). ``run_*`` functions are the single place to later
-plug Claude API / Ollama (see model_config.yaml) without touching the pipeline.
+Default engine is ``template``: deterministic, offline Markdown scaffolding built
+from the extracted paper + venue + reviewer profile. When ``PIPELINE_ENGINE``
+(env) or ``pipeline.default_engine`` names a real engine (``claude``, ``codex``,
+``ollama``, ``gemini``) whose CLI is installed, the agent instead runs that CLI
+with a built prompt and uses its Markdown output. If the engine is unavailable
+or errors, it falls back to the offline scaffold so the pipeline never breaks.
+
+Every output carries the mandatory metadata block (engine, model, mode, sources,
+limitations, confidence).
 """
 from __future__ import annotations
 
@@ -33,7 +37,25 @@ def _engine() -> str:
     return os.environ.get("PIPELINE_ENGINE") or load_config("pipeline").get("default_engine", "template")
 
 
-def _metadata_block(review_id, venue_id, profile_id, agent_id, engine, sources) -> str:
+def _call_engine(engine: str, prompt: str) -> tuple[bool, str, str, str]:
+    """Run a real engine CLI. Returns (ok, text, model, error)."""
+    try:
+        from worker.engines import get_engine, run_query
+    except Exception as exc:  # pragma: no cover
+        return False, "", engine, f"engine layer unavailable: {exc}"
+    eng = get_engine(engine)
+    if eng is None:
+        return False, "", engine, f"unknown engine '{engine}'"
+    if not eng.available():
+        return False, "", eng.model(), f"CLI for '{engine}' not installed/available"
+    res = run_query(engine, prompt)
+    return res.ok, res.text or "", res.model, res.error or ""
+
+
+def _metadata_block(review_id, venue_id, profile_id, agent_id, engine, sources,
+                    *, model: str | None = None, mode: str | None = None) -> str:
+    model = model or engine
+    mode = mode or ("offline" if engine == "template" else "autonomous")
     return "\n".join([
         "## Metadata",
         f"- review_id: {review_id}",
@@ -41,10 +63,11 @@ def _metadata_block(review_id, venue_id, profile_id, agent_id, engine, sources) 
         f"- agent_id: {agent_id}",
         f"- reviewer_profile: {profile_id}",
         f"- engine: {engine}",
-        f"- model: {engine}",
-        f"- mode: {'offline' if engine == 'template' else 'autonomous'}",
+        f"- model: {model}",
+        f"- mode: {mode}",
         f"- data_sources_used: {sources}",
-        "- limitations: Template-generated scaffold; this is a pre-submission simulation, not real peer review. No external literature was consulted unless provided.",
+        "- limitations: Pre-submission simulation, not real peer review. The offline template engine "
+        "produces a scaffold; a real engine produces substantive content but may still err.",
         f"- confidence: {NOT_VERIFIED}",
         f"- generated_at: {now_iso()}",
     ])
@@ -69,23 +92,11 @@ def _scores_table() -> str:
     return "\n".join(rows)
 
 
-def run_reviewer(review_id: str, venue_id: str, profile_id: str, *, agent_id: str | None = None) -> AgentOutput:
-    engine = _engine()
-    agent_id = agent_id or profile_id
-    fields = _paper_fields(review_id)
-    title = fields.get("title", "NEEDS_USER_INPUT")
-    venue_name = _venue_name(venue_id)
-    sources = "manuscript_extracted.md, paper_extraction.json, venue_profile.yaml"
-
-    md = f"""# Reviewer report — {profile_id}
-
-{_metadata_block(review_id, venue_id, profile_id, agent_id, engine, sources)}
-
-## Submission context
-- Target venue: {venue_name} ({venue_id})
-- Manuscript title: {title}
-
-## Summary
+# --------------------------------------------------------------------------- #
+# Scaffold bodies (offline template engine)
+# --------------------------------------------------------------------------- #
+def _reviewer_scaffold_body() -> str:
+    return f"""## Summary
 NEEDS_USER_INPUT — concise neutral summary of the manuscript as understood from the extraction.
 
 ## Venue fit (provisional)
@@ -126,9 +137,41 @@ NEEDS_USER_INPUT (accept | minor revision | major revision | reject | desk rejec
 
 ## Confidence and limitations
 - confidence: {NOT_VERIFIED}
-- This scaffold was produced by the offline template engine. Replace with a real model run (Claude/Ollama) or with imported external responses for substantive content.
-"""
-    return AgentOutput(agent_id, profile_id, venue_id, engine, engine, "offline" if engine == "template" else "autonomous", md)
+- This scaffold was produced by the offline template engine. Set PIPELINE_ENGINE to a real
+  engine (claude/codex/ollama/gemini) or import external responses for substantive content."""
+
+
+# --------------------------------------------------------------------------- #
+# Agents
+# --------------------------------------------------------------------------- #
+def run_reviewer(review_id: str, venue_id: str, profile_id: str, *, agent_id: str | None = None) -> AgentOutput:
+    engine = _engine()
+    agent_id = agent_id or profile_id
+    fields = _paper_fields(review_id)
+    title = fields.get("title", "NEEDS_USER_INPUT")
+    venue_name = _venue_name(venue_id)
+    sources = "manuscript_extracted.md, paper_extraction.json, venue_profile.yaml"
+
+    model, mode = engine, "offline"
+    if engine == "template":
+        body = _reviewer_scaffold_body()
+    else:
+        from worker.external_prompt_manager import build_execution_prompt
+        prompt = build_execution_prompt(review_id, venue_id, profile_id, engine)
+        ok, text, model, err = _call_engine(engine, prompt)
+        if ok and text.strip():
+            body, mode = text, "autonomous"
+        else:
+            body = (f"> Engine '{engine}' unavailable or failed ({err}); offline scaffold used.\n\n"
+                    + _reviewer_scaffold_body())
+            model, mode = "template", "offline"
+
+    header = (
+        f"# Reviewer report — {profile_id}\n\n"
+        + _metadata_block(review_id, venue_id, profile_id, agent_id, engine, sources, model=model, mode=mode)
+        + f"\n\n## Submission context\n- Target venue: {venue_name} ({venue_id})\n- Manuscript title: {title}\n\n"
+    )
+    return AgentOutput(agent_id, profile_id, venue_id, engine, model, mode, header + body)
 
 
 def run_integrity(review_id: str, venue_id: str) -> AgentOutput:
@@ -143,34 +186,37 @@ def run_integrity(review_id: str, venue_id: str) -> AgentOutput:
         "ethical issues", "privacy/consent if minors are involved",
         "dataset/code/license issues",
     ]
-    rows = "\n".join(f"| {c} | NEEDS_USER_INPUT | NOT_VERIFIED |" for c in checks)
-    md = f"""# Integrity / AI-use audit
+    model, mode = engine, "offline"
+    if engine == "template":
+        rows = "\n".join(f"| {c} | NEEDS_USER_INPUT | NOT_VERIFIED |" for c in checks)
+        body = ("## Checklist\n\n| Check | Finding | Confidence |\n| --- | --- | --- |\n"
+                + rows + "\n\n## Overall integrity assessment\nNEEDS_USER_INPUT")
+    else:
+        prompt = _integrity_prompt(review_id, venue_id, checks)
+        ok, text, model, err = _call_engine(engine, prompt)
+        if ok and text.strip():
+            body, mode = text, "autonomous"
+        else:
+            rows = "\n".join(f"| {c} | NEEDS_USER_INPUT | NOT_VERIFIED |" for c in checks)
+            body = (f"> Engine '{engine}' unavailable or failed ({err}); offline scaffold used.\n\n"
+                    "## Checklist\n\n| Check | Finding | Confidence |\n| --- | --- | --- |\n" + rows)
+            model, mode = "template", "offline"
 
-{_metadata_block(review_id, venue_id, 'integrity-ai-use-auditor', 'integrity-ai-use-auditor', engine, 'manuscript_extracted.md')}
-
-> Acts as an editorial checker, not a normal reviewer.
-
-## Checklist
-
-| Check | Finding | Confidence |
-| --- | --- | --- |
-{rows}
-
-## Overall integrity assessment
-NEEDS_USER_INPUT
-"""
-    return AgentOutput("integrity-ai-use-auditor", "integrity-ai-use-auditor", venue_id, engine, engine, "offline", md)
+    header = ("# Integrity / AI-use audit\n\n"
+              + _metadata_block(review_id, venue_id, "integrity-ai-use-auditor",
+                                "integrity-ai-use-auditor", engine, "manuscript_extracted.md",
+                                model=model, mode=mode)
+              + "\n\n> Acts as an editorial checker, not a normal reviewer.\n\n")
+    return AgentOutput("integrity-ai-use-auditor", "integrity-ai-use-auditor", venue_id, engine, model, mode, header + body)
 
 
 def run_editor(review_id: str, venue_id: str, reviewer_files: list[Path]) -> AgentOutput:
     engine = _engine()
     venue_name = _venue_name(venue_id)
     reviewer_list = "\n".join(f"- {p.name}" for p in reviewer_files) or "- (none)"
-    md = f"""# Editor-in-chief decision
 
-{_metadata_block(review_id, venue_id, 'editor-in-chief', 'editor-in-chief', engine, 'reviewer_outputs/*, integrity audit, venue_profile.yaml')}
-
-## Target venue
+    model, mode = engine, "offline"
+    scaffold = f"""## Target venue
 {venue_name} ({venue_id})
 
 ## Reviews considered
@@ -192,6 +238,71 @@ PROVISIONAL — NEEDS_USER_INPUT. Consider redirection to another venue if appro
 NEEDS_USER_INPUT (desk reject | reject | major revision | minor revision | accept)
 
 ## What must change for this paper to be acceptable
-- NEEDS_USER_INPUT
-"""
-    return AgentOutput("editor-in-chief", "editor-in-chief", venue_id, engine, engine, "offline", md)
+- NEEDS_USER_INPUT"""
+
+    if engine != "template":
+        prompt = _editor_prompt(review_id, venue_id, venue_name, reviewer_files)
+        ok, text, model, err = _call_engine(engine, prompt)
+        if ok and text.strip():
+            scaffold, mode = text, "autonomous"
+        else:
+            scaffold = f"> Engine '{engine}' unavailable or failed ({err}); offline scaffold used.\n\n" + scaffold
+            model, mode = "template", "offline"
+
+    md = ("# Editor-in-chief decision\n\n"
+          + _metadata_block(review_id, venue_id, "editor-in-chief", "editor-in-chief", engine,
+                            "reviewer_outputs/*, integrity audit, venue_profile.yaml",
+                            model=model, mode=mode)
+          + "\n\n" + scaffold + "\n")
+    return AgentOutput("editor-in-chief", "editor-in-chief", venue_id, engine, model, mode, md)
+
+
+# --------------------------------------------------------------------------- #
+# Prompt builders for the real-engine path
+# --------------------------------------------------------------------------- #
+def _paper_summary(review_id: str) -> str:
+    p = review_dir(review_id) / "extracted" / "paper_extraction.md"
+    return read_text(p) if p.exists() else "NEEDS_USER_INPUT (no extraction)"
+
+
+def _integrity_prompt(review_id: str, venue_id: str, checks: list[str]) -> str:
+    bullet = "\n".join(f"- {c}" for c in checks)
+    return f"""You are an editorial integrity checker for a simulated pre-submission review (not a reviewer).
+Review ID: {review_id}. Venue: {venue_id}.
+
+Manuscript extraction:
+{_paper_summary(review_id)}
+
+Check for the following and report findings as a Markdown table (Check | Finding | Confidence),
+then an overall integrity assessment:
+{bullet}
+
+Rules: do not invent references, metrics or policies. Use NOT_VERIFIED / NEEDS_USER_INPUT when
+something cannot be confirmed. Separate evidence from inference. Output Markdown only."""
+
+
+def _editor_prompt(review_id: str, venue_id: str, venue_name: str, reviewer_files: list[Path]) -> str:
+    reports = []
+    for p in reviewer_files[:12]:
+        try:
+            reports.append(f"### {p.name}\n{read_text(p)[:4000]}")
+        except Exception:
+            continue
+    joined = "\n\n".join(reports) or "(no reviewer reports found)"
+    return f"""You are the Editor-in-Chief for a simulated pre-submission editorial review.
+Review ID: {review_id}. Target venue: {venue_name} ({venue_id}).
+
+Manuscript extraction:
+{_paper_summary(review_id)}
+
+Independent reviewer reports:
+{joined}
+
+Produce Markdown with these sections: Target venue, Reviews considered, Synthesis of
+disagreements, Decisive weaknesses, Real strengths, Venue suitability, Decision
+(desk reject | reject | major revision | minor revision | accept), and "What must change for
+this paper to be acceptable".
+
+Rules: explain disagreements; identify decisive weaknesses and real strengths; recommend a
+different venue if appropriate; separate mandatory revisions from optional improvements; do NOT
+mechanically average scores; do not invent references or metrics. Output Markdown only."""

@@ -75,10 +75,13 @@ tests/          conftest, test_worker_core, test_venue_discovery, test_pipeline,
   `--review-id <id> --venue <vid> --reviewer reviewer-methodology --engine codex`.
 
 ## Known limitations / not done (by design for MVP)
-- Internal reviewers are **offline template scaffolds** unless `PIPELINE_ENGINE`/Execute-query
-  uses a real CLI. (Seam in `worker/agent_orchestrator.py` not yet wired to engines for the
-  internal pipeline — only the Execute-query button uses engines so far.)
-- No async task queue (in-process).
+- Internal reviewers/editor/integrity default to the **offline template** scaffold. Set
+  `PIPELINE_ENGINE=claude|codex|gemini|ollama` to run that CLI for the **whole internal pipeline**
+  (reviewers + integrity + editor), with automatic offline fallback if the CLI is missing/errors.
+  Wired in `worker/agent_orchestrator.py` (real-engine path + prompt builders). The Execute-query
+  button remains for per-prompt, on-demand runs.
+- No async task queue (in-process). Note: with a real engine, a full review spawns ~10 CLI calls
+  sequentially (slow but expected); `template` stays instant.
 - PDF export best-effort (weasyprint only in Docker image).
 - Perplexity engine intentionally omitted.
 - Recent-papers upload UI and pending-request auto-loop are stubs.

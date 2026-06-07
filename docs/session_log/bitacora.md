@@ -77,10 +77,19 @@ table, native launcher, web UI vs no-frontend usage). Added `scripts/dev_native.
 
 ## 10. "Create a logbook; document everything to continue the session; in a dedicated folder"
 **Done:** This `docs/session_log/` folder (`README`, `STATE`, `bitacora`, `DECISIONS`, `CONTINUE`).
+Committed `b94c84d`; **merged `feat/mvp-scaffold` → `master`** (ff). `master` ahead of
+`origin/master` by 3 (not pushed — user only asked to commit).
+
+## 11. "Continue with the recommended next step"
+**Done:** Wired the engine CLIs into the **internal pipeline**. `worker/agent_orchestrator.py`
+now runs the real CLI (`claude`/`codex`/`gemini`/`ollama`) for reviewers, the integrity audit and
+the editor when `PIPELINE_ENGINE` names a real engine, with **offline template fallback** if the
+CLI is missing/errors. Added prompt builders (`_integrity_prompt`, `_editor_prompt`; reviewers
+reuse `build_execution_prompt`). 4 new tests (engine path used / fallback / editor / template
+default) → **36 pytest pass**. Updated STATE.md + CONTINUE.md.
 
 ---
 
 ### Pending after this entry
-- Commit entries 8–10 (launcher, run_query CLI, README host section, this logbook).
-- **Merge `feat/mvp-scaffold` → `master`** (recommended; awaiting/with user OK).
-- Optional next: see `CONTINUE.md`.
+- Optional: `git push` (master ahead of origin by 4 after this commit).
+- Run Playwright E2E; do a real-engine full_review; see `CONTINUE.md`.

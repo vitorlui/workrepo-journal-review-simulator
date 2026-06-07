@@ -15,10 +15,12 @@ pass; Docker images build. Work is on branch `feat/mvp-scaffold`.
    one-time login: run `codex` / `gemini` once and sign in).
 
 ## Candidate next steps (not yet done)
-- **Wire engines into the internal pipeline.** Right now only the Execute-query button uses
-  engines; `worker/agent_orchestrator.run_reviewer/run_editor/run_integrity` still emit
-  template scaffolds. Make them call `worker.engines.run_query(...)` when `PIPELINE_ENGINE`
-  is a real engine, with offline fallback. → real multi-reviewer runs via CLI.
+- ~~Wire engines into the internal pipeline~~ **DONE** (2026-06-07): `agent_orchestrator` runs the
+  real CLI for reviewers/integrity/editor when `PIPELINE_ENGINE` is set, with offline fallback.
+  Next polish: per-call model-comparison output, or per-venue parallelism.
+- **End-to-end real-engine run:** set `PIPELINE_ENGINE=codex` (or claude/gemini, logged in),
+  `python scripts/run_pipeline.py --review-id <id> --mode full_review`, and review the generated
+  Markdown for quality. (Slow: ~10 CLI calls.)
 - **Run the Playwright E2E** now that Node is installed: `cd apps/web; npm install;
   npm run test:e2e:install; npm run test:e2e` (stack must be up).
 - **"Review my pending papers"** flow: the user offered to provide real papers; ingest them

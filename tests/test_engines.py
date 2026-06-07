@@ -84,6 +84,49 @@ def test_engine_status_shape():
     assert "claude" in st and set(st["claude"]) >= {"available", "bin", "model"}
 
 
+def test_reviewer_uses_engine_when_set(monkeypatch):
+    import worker.agent_orchestrator as ao
+    monkeypatch.setenv("PIPELINE_ENGINE", "codex")
+    monkeypatch.setattr(ao, "_call_engine",
+                        lambda engine, prompt: (True, "# Engine Review\nEXCELLENT WORK", "codex-model", ""))
+    out = ao.run_reviewer("REVX", "somevenue", "reviewer-methodology")
+    assert out.mode == "autonomous"
+    assert out.engine == "codex" and out.model == "codex-model"
+    assert "EXCELLENT WORK" in out.markdown
+    assert "- engine: codex" in out.markdown
+
+
+def test_reviewer_falls_back_to_template_on_engine_failure(monkeypatch):
+    import worker.agent_orchestrator as ao
+    monkeypatch.setenv("PIPELINE_ENGINE", "gemini")
+    monkeypatch.setattr(ao, "_call_engine",
+                        lambda engine, prompt: (False, "", "gemini", "not installed"))
+    out = ao.run_reviewer("REVX", "v", "reviewer-domain")
+    assert out.mode == "offline" and out.model == "template"
+    assert "offline scaffold used" in out.markdown
+    assert "NEEDS_USER_INPUT" in out.markdown
+
+
+def test_editor_uses_engine_when_set(monkeypatch):
+    import worker.agent_orchestrator as ao
+    monkeypatch.setenv("PIPELINE_ENGINE", "claude")
+    monkeypatch.setattr(ao, "_call_engine",
+                        lambda engine, prompt: (True, "## Decision\nminor revision", "claude-x", ""))
+    out = ao.run_editor("REVX", "v", [])
+    assert out.mode == "autonomous"
+    assert "minor revision" in out.markdown
+    assert "- engine: claude" in out.markdown
+
+
+def test_template_default_is_offline(monkeypatch):
+    import worker.agent_orchestrator as ao
+    monkeypatch.setenv("PIPELINE_ENGINE", "template")
+    out = ao.run_reviewer("REVX", "v", "reviewer-methodology")
+    assert out.mode == "offline" and out.engine == "template"
+    assert "do not mechanically average" not in out.markdown.lower()  # reviewer, not editor
+    assert "## Scores" in out.markdown
+
+
 def test_execute_query_saves_response(monkeypatch):
     import worker.run_query as rq
     from worker.engines.base import EngineResult
