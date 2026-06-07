@@ -29,6 +29,7 @@ export const api = {
     jfetch<any>(`/reviews/${id}/select-venues`, { method: "POST", body: JSON.stringify({ venue_ids }) }),
   tree: (id: string) => jfetch<any>(`/reviews/${id}/tree`),
   summary: (id: string) => jfetch<any>(`/reviews/${id}/summary`),
+  venueCandidates: (id: string) => jfetch<any>(`/reviews/${id}/venue-candidates`),
   artifact: (id: string, relpath: string) =>
     jfetch<any>(`/reviews/${id}/artifact?relpath=${encodeURIComponent(relpath)}`),
   externalPrompts: (id: string) => jfetch<any>(`/reviews/${id}/external-prompts`),

@@ -7,11 +7,11 @@ area: journal
 publisher_or_organizer: computer vision / image understanding
 official_url: Elsevier
 venue_family:
-- Scopus
-- Web of Science.
+- '3'
+- '6'
 venue_family_labels:
-- Scopus
-- Web of Science.
+- Computer vision / pattern recognition
+- Educational technology
 scope_summary: Media si la contribución es muy incremental o fuera de CV.
 quartile_or_rank: https://www.sciencedirect.com/journal/computer-vision-and-image-understanding
 ranking_source: Entre Q1 y Q2 según categoría; SJR intermedio en CV/PR.[web:66]
@@ -54,3 +54,4 @@ notes: Buena alternativa un poco más accesible que IJCV para doc‑AI/robust CV
 last_verified_at: UNKNOWN
 imported_at: '2026-06-07T13:26:59Z'
 import_source: perplexity_final_response2.csv
+family_corrected: true

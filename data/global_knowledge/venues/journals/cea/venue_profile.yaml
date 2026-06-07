@@ -7,9 +7,13 @@ area: agri AI / HSI / food
 publisher_or_organizer: Elsevier
 official_url: https://www.sciencedirect.com/journal/computers-and-electronics-in-agriculture
 venue_family:
-- strong Q1
+- '9'
+- '10'
+- '11'
 venue_family_labels:
-- strong Q1
+- Agricultural AI / precision agriculture
+- Hyperspectral imaging / remote sensing
+- Food safety / food quality / chemometrics
 scope_summary: agriculture/remote sensing; hyperspectral imaging; food safety/chemometrics;
   applied AI
 quartile_or_rank: Q1 in Agronomy & Crop Science, Animal Science & Zoology, CS Applications;
@@ -53,3 +57,4 @@ notes: UNKNOWN
 last_verified_at: UNKNOWN
 imported_at: '2026-06-07T13:26:59Z'
 import_source: perplexity_final_response1.csv
+family_corrected: true

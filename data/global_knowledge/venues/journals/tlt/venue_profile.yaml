@@ -7,9 +7,11 @@ area: EdTech / learning analytics
 publisher_or_organizer: IEEE
 official_url: https://www.scimagojr.com/journalsearch.php?q=19700167026&tip=sid
 venue_family:
-- strong Q1
+- '6'
+- '7'
 venue_family_labels:
-- strong Q1
+- Educational technology
+- Computing education / CS education
 scope_summary: educational technology; computing education
 quartile_or_rank: Q1 in CS Applications, Education, E-learning; SJR≈1.14; IS≈5.7[web:11][web:17][web:14][web:20]
 ranking_source: Scopus; Web of Science[web:20]
@@ -50,3 +52,4 @@ notes: UNKNOWN
 last_verified_at: UNKNOWN
 imported_at: '2026-06-07T13:26:59Z'
 import_source: perplexity_final_response1.csv
+family_corrected: true

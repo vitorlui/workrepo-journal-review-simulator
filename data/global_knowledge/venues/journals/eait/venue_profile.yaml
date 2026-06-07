@@ -7,9 +7,9 @@ area: EdTech
 publisher_or_organizer: Springer
 official_url: https://www.springer.com/journal/10639
 venue_family:
-- strong Q1
+- '6'
 venue_family_labels:
-- strong Q1
+- Educational technology
 scope_summary: educational technology; computing education; systematic review
 quartile_or_rank: Q1 in Education; IF≈5.4 (2025)[web:75][web:84][web:80]
 ranking_source: Scopus; Web of Science[web:80]
@@ -49,3 +49,4 @@ notes: UNKNOWN
 last_verified_at: UNKNOWN
 imported_at: '2026-06-07T13:26:59Z'
 import_source: perplexity_final_response1.csv
+family_corrected: true

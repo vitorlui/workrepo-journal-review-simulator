@@ -7,9 +7,9 @@ area: CS education
 publisher_or_organizer: ACM
 official_url: https://dl.acm.org/journal/toce
 venue_family:
-- strong Q1
+- '7'
 venue_family_labels:
-- strong Q1
+- Computing education / CS education
 scope_summary: computing education; engineering education; systematic review
 quartile_or_rank: Q1 in CS(misc.) and Education; SJR≈0.78; CiteScore≈7.2[web:10][web:22][web:13][web:19]
 ranking_source: Scopus; Web of Science
@@ -50,3 +50,4 @@ notes: UNKNOWN
 last_verified_at: UNKNOWN
 imported_at: '2026-06-07T13:26:59Z'
 import_source: perplexity_final_response1.csv
+family_corrected: true

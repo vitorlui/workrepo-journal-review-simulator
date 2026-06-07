@@ -7,9 +7,11 @@ area: EdTech / CS Ed
 publisher_or_organizer: Elsevier
 official_url: https://www.sciencedirect.com/journal/computers-and-education
 venue_family:
-- elite Q1
+- '6'
+- '7'
 venue_family_labels:
-- elite Q1
+- Educational technology
+- Computing education / CS education
 scope_summary: educational technology; computing education; systematic review
 quartile_or_rank: Q1 in Education and CS Applications; very high IF and h-index[web:12][web:21][web:77]
 ranking_source: Scopus; Web of Science
@@ -51,3 +53,4 @@ notes: UNKNOWN
 last_verified_at: UNKNOWN
 imported_at: '2026-06-07T13:26:59Z'
 import_source: perplexity_final_response1.csv
+family_corrected: true

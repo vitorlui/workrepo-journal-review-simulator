@@ -123,6 +123,22 @@ def get_artifact(review_id: str, relpath: str) -> dict:
         raise HTTPException(status_code=415, detail="Artifact is not text")
 
 
+@router.get("/{review_id}/venue-candidates")
+def venue_candidates(review_id: str) -> dict:
+    """Venues ranked by relevance to this review's detected families."""
+    if review_svc.get_review(review_id) is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    from worker.venues import discover_venues
+    meta = read_yaml(review_dir(review_id) / "metadata.yaml")
+    fams = meta.get("likely_venue_families", []) or []
+    ranked = discover_venues(review_id, fams)
+    return {
+        "likely_venue_families": fams,
+        "detected_area_labels": meta.get("detected_area_labels", []),
+        "candidates": ranked,
+    }
+
+
 @router.get("/{review_id}/summary")
 def review_summary(review_id: str) -> dict:
     """Digest of each reviewer's recommendation + the editor's decision."""

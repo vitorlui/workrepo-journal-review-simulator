@@ -103,14 +103,29 @@ export default function ReviewWizard({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      {/* Step nav */}
-      <div className="flex flex-wrap gap-1">
-        {STEPS.map((label, i) => (
-          <button key={i} onClick={() => setStep(i)}
-            className={`text-xs rounded px-2 py-1 border ${step === i ? "bg-ieee text-white border-ieee" : "border-slate-300 text-slate-600 hover:bg-slate-100"}`}>
-            {label}
-          </button>
-        ))}
+      {/* Step nav: reached steps are solid, pending steps are dimmed/italic. */}
+      <div className="flex flex-wrap gap-1 items-center">
+        {STEPS.map((label, i) => {
+          const cur = Number(review?.current_step ?? 0);
+          const active = step === i;
+          const reached = i <= cur;
+          const cls = active
+            ? "bg-ieee text-white border-ieee"
+            : reached
+              ? "border-slate-300 text-slate-700 hover:bg-slate-100"
+              : "border-slate-200 text-slate-300 italic hover:bg-slate-50";
+          return (
+            <button key={i} onClick={() => setStep(i)} title={reached ? "" : "pending"}
+              className={`text-xs rounded px-2 py-1 border ${cls}`}>
+              {label}
+            </button>
+          );
+        })}
+        <button onClick={() => setStep((s) => Math.min(s + 1, STEPS.length - 1))}
+          className="text-xs rounded px-3 py-1 bg-petrol text-white hover:opacity-90 ml-1 font-medium"
+          disabled={step >= STEPS.length - 1}>
+          Next →
+        </button>
       </div>
 
       {msg && <div className="card text-xs text-slate-600">{msg}</div>}
@@ -132,7 +147,7 @@ function StepPanel({ id, step, review, run, busy, onChange, setMsg, tick }: any)
   if (step === 1) return <UploadStep id={id} onChange={onChange} setMsg={setMsg} />;
   if (step === 2) return <ArtifactStep id={id} title="Extraction" mode="extract" run={run} busy={busy} relpath="extracted/paper_extraction.md" />;
   if (step === 3) return <ArtifactStep id={id} title="Area & Paper Type" mode="classify" run={run} busy={busy} relpath="extracted/classification.md" />;
-  if (step === 4) return <VenuesStep id={id} review={review} run={run} busy={busy} setMsg={setMsg} />;
+  if (step === 4) return <VenuesStep id={id} review={review} run={run} busy={busy} setMsg={setMsg} tick={tick} />;
   if (step === 5) return <ArtifactStep id={id} title="Desk-Reject Precheck" mode="desk_reject_precheck" run={run} busy={busy} relpath="venues/desk_reject_precheck.md" />;
   if (step === 6) return <ReviewerProfilesStep />;
   if (step === 7) return <PromptsStep id={id} review={review} run={run} busy={busy} setMsg={setMsg} />;
@@ -257,13 +272,17 @@ function ResultsStep({ id, run, busy, tick }: any) {
   );
 }
 
-function VenuesStep({ id, review, run, busy, setMsg }: any) {
-  const [venues, setVenues] = useState<any[]>([]);
+function VenuesStep({ id, review, run, busy, setMsg, tick }: any) {
+  const [data, setData] = useState<any>({ candidates: [], detected_area_labels: [] });
   const [selected, setSelected] = useState<string[]>([]);
+  const [showAll, setShowAll] = useState(false);
+  function load() { api.venueCandidates(id).then(setData).catch((e) => setMsg(String(e))); }
   useEffect(() => {
-    api.listVenues().then(setVenues).catch((e) => setMsg(String(e)));
+    load();
     setSelected(review?.metadata?.selected_venues || []);
-  }, [review, setMsg]);
+    // eslint-disable-next-line
+  }, [id, tick]);
+
   function toggle(vid: string) {
     setSelected((s) => s.includes(vid) ? s.filter((x) => x !== vid) : [...s, vid]);
   }
@@ -271,23 +290,39 @@ function VenuesStep({ id, review, run, busy, setMsg }: any) {
     await api.selectVenues(id, selected);
     setMsg(`Saved ${selected.length} selected venues`);
   }
+
+  const cands: any[] = data.candidates || [];
+  const relevant = cands.filter((c) => c.score > 0);
+  const shown = showAll ? cands : (relevant.length ? relevant : cands.slice(0, 8));
+
   return (
     <div className="card space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="font-semibold text-ieee-dark">Venues ({venues.length})</h2>
+        <div>
+          <h2 className="font-semibold text-ieee-dark">Candidate venues</h2>
+          <div className="text-xs text-slate-500">
+            Detected areas: {(data.detected_area_labels || []).join(" · ") || "run Extraction + Area & Paper Type first"}
+          </div>
+        </div>
         <div className="flex gap-2">
-          <button className="btn-ghost" onClick={() => run("discover_venues")} disabled={busy}>Discover candidates</button>
+          <button className="btn-ghost" onClick={() => run("discover_venues").then(load)} disabled={busy}>Re-rank</button>
           <button className="btn-primary" onClick={save}>Save selection ({selected.length})</button>
         </div>
       </div>
+      {relevant.length === 0 && (
+        <p className="text-xs text-amber-600">No venues match the detected areas yet — run Extraction + Area &amp; Paper Type first (or “Show all”).</p>
+      )}
       <div className="table-wrap max-h-[28rem] overflow-auto">
         <table className="w-full">
-          <thead><tr><th className="th"></th><th className="th">Venue</th><th className="th">Q1 access</th><th className="th">Quartile/Rank</th><th className="th">Speed</th></tr></thead>
+          <thead><tr><th className="th"></th><th className="th">Match</th><th className="th">Venue</th><th className="th">Q1 access</th><th className="th">Quartile/Rank</th><th className="th">Speed</th></tr></thead>
           <tbody>
-            {venues.map((v) => (
-              <tr key={v.venue_id}>
+            {shown.map((v) => (
+              <tr key={v.venue_id} className={v.score > 0 ? "" : "opacity-50"}>
                 <td className="td"><input type="checkbox" checked={selected.includes(v.venue_id)} onChange={() => toggle(v.venue_id)} /></td>
-                <td className="td"><div className="font-medium">{v.name}</div><div className="text-xs text-slate-500">{v.acronym} · {v.venue_id}</div></td>
+                <td className="td">{v.score > 0
+                  ? <span className="inline-block rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800">✓ {v.score}</span>
+                  : <span className="text-xs text-slate-400">—</span>}</td>
+                <td className="td"><div className="font-medium">{v.name}</div><div className="text-xs text-slate-500">{v.acronym} · {(v.family_labels || []).join("; ")}</div></td>
                 <td className="td">{v.q1_accessibility_class}</td>
                 <td className="td text-xs">{v.quartile_or_rank}</td>
                 <td className="td">{v.publication_speed_category}</td>
@@ -296,6 +331,9 @@ function VenuesStep({ id, review, run, busy, setMsg }: any) {
           </tbody>
         </table>
       </div>
+      <button className="text-xs text-ieee hover:underline" onClick={() => setShowAll(!showAll)}>
+        {showAll ? "Show only matches" : `Show all ${cands.length} venues`}
+      </button>
     </div>
   );
 }
