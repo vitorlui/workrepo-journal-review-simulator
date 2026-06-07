@@ -39,6 +39,12 @@ data/uploads/
 *.db
 data/jrs_local.db
 
+# Private E2E papers (keep only the sample + readme)
+apps/web/e2e/papers/*
+!apps/web/e2e/papers/.gitkeep
+!apps/web/e2e/papers/README.md
+!apps/web/e2e/papers/sample_manuscript.md
+
 # Private papers / large binaries by default
 *.pdf
 *.zip
