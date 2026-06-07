@@ -74,7 +74,7 @@ function isStepDone(i: number, files: string[], review: any): boolean {
     case 10: return has("reviewer_outputs/integrity_ai_use_audit.md");
     case 11: return has("editor/editor_decision.md");
     case 12: return has("editor/revision_plan.md");
-    case 13: return has("exports/full_review_package.zip");
+    case 13: return has("exports/"); // any export artifact (the .zip isn't in the md/json tree)
     default: return false;
   }
 }
