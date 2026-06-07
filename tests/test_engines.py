@@ -30,15 +30,16 @@ def test_complete_stdin_substitutes_model(monkeypatch):
     monkeypatch.setattr(cli_engine.shutil, "which", lambda b: "/usr/bin/ollama")
     captured = {}
 
-    def fake_run(argv, input=None, capture_output=True, text=True, timeout=None):
+    def fake_run(argv, stdin=None, input=None, capture_output=True, text=True, timeout=None):
         captured["argv"] = argv
-        captured["input"] = input
+        # stdin mode now feeds a real temp-file handle (avoids the pipe race).
+        captured["stdin_content"] = stdin.read() if stdin is not None else input
         return FakeProc(0, "REVIEW OUTPUT")
 
     monkeypatch.setattr(cli_engine.subprocess, "run", fake_run)
     res = eng.complete("PROMPT")
     assert res.ok and res.text == "REVIEW OUTPUT"
-    assert captured["input"] == "PROMPT"          # prompt via stdin
+    assert captured["stdin_content"] == "PROMPT"  # prompt via stdin file handle
     assert "{model}" not in " ".join(captured["argv"])  # model substituted
 
 

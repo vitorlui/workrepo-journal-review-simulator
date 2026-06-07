@@ -9,8 +9,10 @@ Command templates are configurable in config/model_config.yaml under
 """
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
+import tempfile
 from typing import Optional
 
 from worker.engines.base import EngineResult, ReviewEngine
@@ -53,23 +55,36 @@ class CliEngine(ReviewEngine):
                                 error=f"CLI '{self._bin}' not found on PATH")
         argv = self._argv()
         full_prompt = prompt if not system else f"{system}\n\n{prompt}"
-        stdin_data: Optional[str] = None
-        if self._pass_via == "arg":
-            argv = argv + [full_prompt]
-        else:
-            stdin_data = full_prompt
+        tmp_path: Optional[str] = None
         try:
-            proc = subprocess.run(
-                argv,
-                input=stdin_data,
-                capture_output=True,
-                text=True,
-                timeout=self._timeout,
-            )
+            if self._pass_via == "arg":
+                argv = argv + [full_prompt]
+                proc = subprocess.run(
+                    argv, capture_output=True, text=True, timeout=self._timeout
+                )
+            else:
+                # Feed the prompt from a real temp file as stdin. A piped `input=`
+                # races some CLIs (e.g. `claude -p` aborts after a 3s stdin wait);
+                # a file handle is available immediately and handles large prompts.
+                with tempfile.NamedTemporaryFile(
+                    "w", suffix=".txt", delete=False, encoding="utf-8"
+                ) as tf:
+                    tf.write(full_prompt)
+                    tmp_path = tf.name
+                with open(tmp_path, "r", encoding="utf-8") as fin:
+                    proc = subprocess.run(
+                        argv, stdin=fin, capture_output=True, text=True, timeout=self._timeout
+                    )
         except subprocess.TimeoutExpired:
             return EngineResult(False, "", self.name, self.model(), error="CLI timed out")
         except Exception as exc:  # noqa: BLE001
             return EngineResult(False, "", self.name, self.model(), error=str(exc))
+        finally:
+            if tmp_path:
+                try:
+                    os.unlink(tmp_path)
+                except OSError:
+                    pass
 
         if proc.returncode != 0:
             return EngineResult(False, proc.stdout or "", self.name, self.model(),

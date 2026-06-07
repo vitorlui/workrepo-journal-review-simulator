@@ -245,6 +245,24 @@ def _extract_fields(markdown: str) -> dict:
     if km:
         fields["keywords"] = km.group(1).strip()
 
+    # Fallbacks for non-Markdown sources (PDF/DOCX/plain text) with no '#' headings.
+    lines = [ln.strip() for ln in markdown.splitlines() if ln.strip()]
+    if fields["title"] == NEEDS and lines:
+        # First non-empty line; join a wrapped 2nd line if it looks like a continuation.
+        title = lines[0]
+        if len(lines) > 1 and not re.search(r"@|\d{4}|^abstract", lines[1], re.I) and len(title) < 80:
+            title = f"{title} {lines[1]}"
+        fields["title"] = title[:300]
+    if fields["abstract"] == NEEDS:
+        am = re.search(
+            r"(?is)\babstract\b[\s:.\-—]*(.+?)(?:\n\s*\n|\bkeywords?\b|\bindex terms\b|\b1\.?\s+introduction\b)",
+            markdown,
+        )
+        if am:
+            cand = re.sub(r"\s+", " ", am.group(1)).strip()
+            if len(cand) > 40:
+                fields["abstract"] = cand[:2000]
+
     return fields
 
 
