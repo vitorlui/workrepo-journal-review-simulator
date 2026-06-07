@@ -128,7 +128,9 @@ export default function ReviewWizard({ params }: { params: { id: string } }) {
   const wasRunning = useRef(false);
 
   const refresh = useCallback(() => {
-    api.getReview(id).then(setReview).catch((e) => setMsg(String(e)));
+    // Background poll: ignore transient errors (e.g. an API restart) so they
+    // don't clobber the status line with "Failed to fetch".
+    api.getReview(id).then(setReview).catch(() => {});
   }, [id]);
 
   useEffect(() => { refresh(); }, [refresh]);
@@ -271,17 +273,17 @@ function StepPanel({ id, step, review, run, busy, onChange, setMsg, tick }: any)
     );
   }
   if (step === 1) return <UploadStep id={id} onChange={onChange} setMsg={setMsg} />;
-  if (step === 2) return <ArtifactStep id={id} title="Extraction" mode="extract" run={run} busy={busy} relpath="extracted/paper_extraction.md" />;
-  if (step === 3) return <ArtifactStep id={id} title="Area & Paper Type" mode="classify" run={run} busy={busy} relpath="extracted/classification.md" />;
+  if (step === 2) return <ArtifactStep id={id} title="Extraction" mode="extract" run={run} busy={busy} tick={tick} relpath="extracted/paper_extraction.md" />;
+  if (step === 3) return <ArtifactStep id={id} title="Area & Paper Type" mode="classify" run={run} busy={busy} tick={tick} relpath="extracted/classification.md" />;
   if (step === 4) return <VenuesStep id={id} review={review} run={run} busy={busy} setMsg={setMsg} tick={tick} />;
-  if (step === 5) return <ArtifactStep id={id} title="Desk-Reject Precheck" mode="desk_reject_precheck" run={run} busy={busy} relpath="venues/desk_reject_precheck.md" />;
+  if (step === 5) return <ArtifactStep id={id} title="Desk-Reject Precheck" mode="desk_reject_precheck" run={run} busy={busy} tick={tick} relpath="venues/desk_reject_precheck.md" />;
   if (step === 6) return <ReviewerProfilesStep />;
   if (step === 7) return <PromptsStep id={id} review={review} run={run} busy={busy} setMsg={setMsg} />;
   if (step === 8) return <ResponsesStep id={id} setMsg={setMsg} />;
   if (step === 9) return <ReviewStep id={id} run={run} busy={busy} tick={tick} />;
-  if (step === 10) return <ArtifactStep id={id} title="Integrity Audit" mode="integrity" run={run} busy={busy} relpath="reviewer_outputs/integrity_ai_use_audit.md" />;
+  if (step === 10) return <ArtifactStep id={id} title="Integrity Audit" mode="integrity" run={run} busy={busy} tick={tick} relpath="reviewer_outputs/integrity_ai_use_audit.md" />;
   if (step === 11) return <ResultsStep id={id} run={run} busy={busy} tick={tick} />;
-  if (step === 12) return <ArtifactStep id={id} title="Revision Plan" mode="editorial_decision" run={run} busy={busy} relpath="editor/revision_plan.md" />;
+  if (step === 12) return <ArtifactStep id={id} title="Revision Plan" mode="editorial_decision" run={run} busy={busy} tick={tick} relpath="editor/revision_plan.md" />;
   if (step === 13) return <ExportStep id={id} run={run} busy={busy} />;
   return null;
 }
@@ -314,11 +316,19 @@ function UploadStep({ id, onChange, setMsg }: any) {
   );
 }
 
-function ArtifactStep({ id, title, mode, run, busy, relpath }: any) {
+function ArtifactStep({ id, title, mode, run, busy, relpath, tick }: any) {
   const [content, setContent] = useState("");
   const [raw, setRaw] = useState(false);
-  function load() { api.artifact(id, relpath).then((r) => setContent(r.content)).catch((e) => setContent(String(e))); }
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);
+  const [err, setErr] = useState("");
+  function load() {
+    api.artifact(id, relpath)
+      .then((r) => { setContent(r.content || ""); setErr(""); })
+      .catch((e) => setErr(String(e))); // keep existing content; don't blank the screen
+  }
+  // Reload when switching to a different artifact.
+  useEffect(() => { setContent(""); setErr(""); load(); /* eslint-disable-next-line */ }, [id, relpath]);
+  // Self-heal: if content is still empty (e.g. a transient fetch error), retry on the next poll.
+  useEffect(() => { if (!content) load(); /* eslint-disable-next-line */ }, [tick]);
   return (
     <div className="card space-y-3">
       <div className="flex items-center justify-between">
@@ -329,7 +339,10 @@ function ArtifactStep({ id, title, mode, run, busy, relpath }: any) {
           <button className="btn-primary" disabled={busy} onClick={() => run(mode).then(load)}>Run {mode}</button>
         </div>
       </div>
-      {raw ? <Mono text={content} /> : <Markdown>{content}</Markdown>}
+      {err && <p className="text-xs text-red-500">Could not load ({err}). Retrying…</p>}
+      {content
+        ? (raw ? <Mono text={content} /> : <Markdown>{content}</Markdown>)
+        : <p className="text-sm text-slate-400 italic">Not generated yet — click “Run {mode}”.</p>}
     </div>
   );
 }
