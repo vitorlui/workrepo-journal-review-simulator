@@ -170,6 +170,13 @@ def _do_classify(review_id: str, result: PipelineResult) -> None:
     meta["detected_area_labels"] = cls.detected_area_labels
     meta["paper_type"] = cls.paper_type
     meta["likely_venue_families"] = cls.likely_venue_families
+    # Auto-identify the title from the manuscript (so the user need not type it).
+    fields = read_yaml(review_dir(review_id) / "extracted" / "paper_extraction.json").get("fields", {})
+    extracted_title = (fields.get("title") or "").strip()
+    meta["extracted_title"] = extracted_title or "NEEDS_USER_INPUT"
+    if extracted_title and extracted_title not in ("NEEDS_USER_INPUT", "UNKNOWN") and \
+            (meta.get("title") in (None, "", "UNKNOWN")):
+        meta["title"] = extracted_title[:300]
     _save_meta(review_id, meta)
     write_text(
         review_dir(review_id) / "extracted" / "classification.md",
@@ -187,6 +194,8 @@ def _do_classify(review_id: str, result: PipelineResult) -> None:
             if r is not None:
                 r.paper_type = cls.paper_type
                 r.detected_areas = ", ".join(cls.detected_area_labels)
+                if meta.get("title"):
+                    r.title = meta["title"]
     except Exception:
         pass
     result.outputs.append("extracted/classification.md")

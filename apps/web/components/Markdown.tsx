@@ -16,6 +16,10 @@ function unwrap(md: string): string {
   // If after removing the opening fences there are dangling ``` lines that only
   // wrapped the doc, remove standalone fence lines.
   out = out.replace(/^\s*```\s*$/gm, "");
+  // Internal placeholders are not something the user fills in by hand — show them
+  // as a muted "pending" marker in the UI (the underlying data keeps the token).
+  out = out.replace(/NEEDS_USER_INPUT\s*\([^)]*\)/g, "⏳ _pending — run a real engine_");
+  out = out.replace(/\bNEEDS_USER_INPUT\b/g, "⏳ _pending_");
   return out;
 }
 

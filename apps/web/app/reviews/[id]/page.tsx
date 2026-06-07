@@ -11,11 +11,89 @@ const STEPS = [
   "11. Editor Decision", "12. Revision Plan", "13. Export",
 ];
 
+// Rough per-mode ETA (seconds) with the offline template engine. Real engines
+// (claude/codex) take much longer; the bar caps and shows "still running".
+const ETA_SECONDS: Record<string, number> = {
+  full_review: 12, review: 4, specialized_review: 4, integrity: 3, editorial_decision: 3,
+  extract: 2, classify: 1, desk_reject_precheck: 1, generate_external_prompts: 2,
+  export: 2, discover_venues: 1, venue_fit: 1, timeline: 1, scan_venues: 1,
+};
+
+function requestNotifyPermission() {
+  try {
+    if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
+  } catch { /* ignore */ }
+}
+
+function notify(msg: string, fallback?: (m: string) => void) {
+  try {
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Journal Review Simulator", { body: msg });
+    }
+  } catch { /* ignore */ }
+  if (fallback) fallback(msg);
+}
+
+function RunningPanel({ mode, elapsed, eta }: { mode: string; elapsed: number; eta: number }) {
+  const pct = Math.min(elapsed / Math.max(eta, 1), 1) * 100;
+  const over = elapsed > eta;
+  return (
+    <div className="card border-amber-300 bg-amber-50">
+      <div className="flex items-center gap-3">
+        <span className="h-4 w-4 shrink-0 rounded-full border-2 border-amber-500 border-t-transparent animate-spin" />
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium text-amber-800">Running: {mode || "pipeline"}…</div>
+          <div className="text-xs text-amber-700">
+            elapsed {elapsed}s · {over ? "ETA passed — a real engine takes longer, hold on" : `ETA ~${eta}s (template engine)`}
+          </div>
+          <div className="mt-1 h-1.5 w-full rounded-full bg-amber-200 overflow-hidden">
+            <div className={`h-full ${over ? "bg-amber-400 animate-pulse w-full" : "bg-amber-500 transition-all"}`}
+              style={over ? undefined : { width: `${pct}%` }} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// A step is "done" when its output artifact exists — more accurate than current_step.
+function isStepDone(i: number, files: string[], review: any): boolean {
+  const has = (p: string) => files.some((f) => f === p || f.startsWith(p));
+  const selected = (review?.metadata?.selected_venues || []).length > 0;
+  switch (i) {
+    case 0: return !!review;
+    case 1: return has("input/original/") || has("input/upload_report.md");
+    case 2: return has("extracted/paper_extraction.md");
+    case 3: return has("extracted/classification.md");
+    case 4: return has("venues/candidate_venues.md") || selected;
+    case 5: return has("venues/desk_reject_precheck.md");
+    case 6: return true;
+    case 7: return has("external_prompts/index.md");
+    case 8: return has("external_responses/index.md");
+    case 9: return has("reviewer_outputs/internal/");
+    case 10: return has("reviewer_outputs/integrity_ai_use_audit.md");
+    case 11: return has("editor/editor_decision.md");
+    case 12: return has("editor/revision_plan.md");
+    case 13: return has("exports/full_review_package.zip");
+    default: return false;
+  }
+}
+
 function Mono({ text }: { text: string }) {
   return (
     <pre className="mt-3 max-h-[28rem] overflow-auto rounded-md bg-slate-50 border border-slate-200 p-3 text-xs whitespace-pre-wrap">
       {text || "(empty)"}
     </pre>
+  );
+}
+
+function Field({ k, v }: { k: string; v: any }) {
+  const empty = v == null || v === "" || v === "UNKNOWN" || /NEEDS_USER_INPUT/.test(String(v));
+  return (
+    <div className="contents">
+      <dt className="text-slate-500">{k}</dt>
+      <dd className={empty ? "text-slate-400 italic" : "font-medium text-slate-800"}>{empty ? "⏳ pending" : String(v)}</dd>
+    </div>
   );
 }
 
@@ -43,6 +121,11 @@ export default function ReviewWizard({ params }: { params: { id: string } }) {
   const [busy, setBusy] = useState(false);
   const [auto, setAuto] = useState(true);
   const [tick, setTick] = useState(0);
+  const [runMode, setRunMode] = useState("");
+  const [elapsed, setElapsed] = useState(0);
+  const [tree, setTree] = useState<string[]>([]);
+  const startRef = useRef<number | null>(null);
+  const wasRunning = useRef(false);
 
   const refresh = useCallback(() => {
     api.getReview(id).then(setReview).catch((e) => setMsg(String(e)));
@@ -57,6 +140,31 @@ export default function ReviewWizard({ params }: { params: { id: string } }) {
     const t = setInterval(() => { refresh(); setTick((x) => x + 1); }, 4000);
     return () => clearInterval(t);
   }, [auto, refresh]);
+
+  // Which artifacts exist -> which steps are actually done (drives the dimming).
+  useEffect(() => { api.tree(id).then((r) => setTree(r.files || [])).catch(() => {}); }, [id, tick]);
+
+  // A run is active when triggered here (busy) OR detected via polling (status running:*),
+  // so the panel also reflects pipelines started from the CLI.
+  const status: string = review?.status || "";
+  const isRunning = busy || status.startsWith("running:");
+  const activeMode = busy ? runMode : status.startsWith("running:") ? status.split(":")[1] : runMode;
+  const eta = ETA_SECONDS[activeMode] ?? 5;
+
+  // Elapsed timer while running.
+  useEffect(() => {
+    if (!isRunning) { startRef.current = null; setElapsed(0); return; }
+    if (startRef.current === null) startRef.current = Date.now();
+    const t = setInterval(() => setElapsed(Math.round((Date.now() - (startRef.current as number)) / 1000)), 500);
+    return () => clearInterval(t);
+  }, [isRunning]);
+
+  // Notify on the running -> idle transition.
+  useEffect(() => {
+    if (wasRunning.current && !isRunning) notify(`Finished${activeMode ? `: ${activeMode}` : ""}`, setMsg);
+    wasRunning.current = isRunning;
+    // eslint-disable-next-line
+  }, [isRunning]);
 
   async function run(mode: string) {
     // Guard: re-running a review-generating step over an already-generated
@@ -74,6 +182,8 @@ export default function ReviewWizard({ params }: { params: { id: string } }) {
         `Confirm again — regenerate "${mode}" and overwrite the existing results? This cannot be undone.`
       )) return;
     }
+    setRunMode(mode);
+    requestNotifyPermission();
     setBusy(true); setMsg(`Running ${mode}...`);
     try {
       const r = await api.runPipeline(id, mode);
@@ -103,21 +213,22 @@ export default function ReviewWizard({ params }: { params: { id: string } }) {
         </div>
       </div>
 
+      {isRunning && <RunningPanel mode={activeMode} elapsed={elapsed} eta={eta} />}
+
       {/* Step nav: reached steps are solid, pending steps are dimmed/italic. */}
       <div className="flex flex-wrap gap-1 items-center">
         {STEPS.map((label, i) => {
-          const cur = Number(review?.current_step ?? 0);
           const active = step === i;
-          const reached = i <= cur;
+          const done = isStepDone(i, tree, review);
           const cls = active
             ? "bg-ieee text-white border-ieee"
-            : reached
+            : done
               ? "border-slate-300 text-slate-700 hover:bg-slate-100"
-              : "border-slate-200 text-slate-300 italic hover:bg-slate-50";
+              : "border-dashed border-slate-200 text-slate-300 italic opacity-70 hover:bg-slate-50";
           return (
-            <button key={i} onClick={() => setStep(i)} title={reached ? "" : "pending"}
+            <button key={i} onClick={() => setStep(i)} title={done ? "done" : "pending"}
               className={`text-xs rounded px-2 py-1 border ${cls}`}>
-              {label}
+              {done && !active ? "✓ " : ""}{label}
             </button>
           );
         })}
@@ -137,10 +248,25 @@ export default function ReviewWizard({ params }: { params: { id: string } }) {
 
 function StepPanel({ id, step, review, run, busy, onChange, setMsg, tick }: any) {
   if (step === 0) {
+    const m = review?.metadata || {};
     return (
-      <div className="card">
-        <h2 className="font-semibold text-ieee-dark mb-2">Metadata</h2>
-        <Mono text={JSON.stringify(review?.metadata || {}, null, 2)} />
+      <div className="card space-y-3">
+        <h2 className="font-semibold text-ieee-dark">Metadata</h2>
+        <p className="text-xs text-slate-500">
+          The review was created on “New Review”. Title, research area and paper type are
+          <strong> auto-identified from the uploaded paper</strong> (step 1 Upload → step 2 Extraction →
+          step 3 Area &amp; Paper Type) — you don't fill them by hand.
+        </p>
+        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-sm">
+          <Field k="Title" v={m.title} />
+          <Field k="Submission type" v={m.submission_type} />
+          <Field k="Status" v={m.status} />
+          <Field k="Paper type" v={m.paper_type} />
+          <Field k="Detected areas" v={(m.detected_area_labels || m.detected_areas || []).join(", ")} />
+          <Field k="Selected venues" v={(m.selected_venues || []).join(", ")} />
+          <Field k="Final decision" v={m.final_decision} />
+          <Field k="Review ID" v={m.review_id} />
+        </dl>
       </div>
     );
   }
@@ -217,6 +343,14 @@ function decisionColor(d: string): string {
   return "bg-slate-50 text-slate-700 border-slate-200";
 }
 
+// Show a clean recommendation; internal placeholders become a muted "pending".
+function prettyRec(rec: string): { text: string; pending: boolean } {
+  if (!rec || rec === "—" || /NEEDS_USER_INPUT|NOT_VERIFIED/.test(rec)) {
+    return { text: "⏳ pending — run a real engine", pending: true };
+  }
+  return { text: rec.replace(/\*\*/g, "").replace(/\*/g, "").trim(), pending: false };
+}
+
 function ResultsStep({ id, run, busy, tick }: any) {
   const [sum, setSum] = useState<any>(null);
   const [editor, setEditor] = useState("");
@@ -252,7 +386,7 @@ function ResultsStep({ id, run, busy, tick }: any) {
                 <tr key={r.name}>
                   <td className="td"><div className="font-medium">{r.name}</div><div className="text-xs text-slate-400">{r.kind}</div></td>
                   <td className="td"><span className={`badge ${r.is_real ? "" : "opacity-60"}`}>{r.engine} · {r.mode}</span></td>
-                  <td className="td text-sm">{r.recommendation}</td>
+                  <td className="td text-sm">{(() => { const p = prettyRec(r.recommendation); return <span className={p.pending ? "text-slate-400 italic" : ""}>{p.text}</span>; })()}</td>
                 </tr>
               ))}
               {reviewers.length === 0 && (
