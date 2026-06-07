@@ -1,5 +1,11 @@
 import { test, expect } from "@playwright/test";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    try { localStorage.setItem("jrs_help_seen_v1", "1"); } catch {}
+  });
+});
+
 test("create a review and open the wizard", async ({ page }) => {
   await page.goto("/reviews/new");
   await page.getByPlaceholder(/Lightweight FAS/).fill("E2E test paper");

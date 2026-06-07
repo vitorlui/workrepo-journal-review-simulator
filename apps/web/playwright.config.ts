@@ -11,10 +11,14 @@ export default defineConfig({
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,
   reporter: [["list"]],
+  // Run serially when watching a headed/slow demo so steps are easy to follow.
+  workers: process.env.PW_SLOWMO ? 1 : undefined,
   use: {
     baseURL: process.env.E2E_BASE_URL || "http://localhost:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
+    // PW_SLOWMO=800 slows each action so you can watch the browser drive the UI.
+    launchOptions: { slowMo: Number(process.env.PW_SLOWMO || 0) },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

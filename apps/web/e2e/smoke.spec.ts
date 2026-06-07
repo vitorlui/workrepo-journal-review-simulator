@@ -1,5 +1,12 @@
 import { test, expect } from "@playwright/test";
 
+// Suppress the first-run guided tour so it doesn't intercept clicks.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    try { localStorage.setItem("jrs_help_seen_v1", "1"); } catch {}
+  });
+});
+
 test("dashboard and sidebar render", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();

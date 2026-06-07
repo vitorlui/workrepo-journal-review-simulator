@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
+import HelpButton from "@/components/HelpButton";
 
 export const metadata: Metadata = {
   title: "Journal Review Simulator",
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="max-w-6xl mx-auto px-6 py-6">{children}</div>
           </main>
         </div>
+        <HelpButton />
       </body>
     </html>
   );
