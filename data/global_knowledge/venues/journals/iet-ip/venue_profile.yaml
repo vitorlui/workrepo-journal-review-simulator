@@ -1,0 +1,52 @@
+venue_id: iet-ip
+source_ref: V12 from perplexity_final_response1.csv
+name: IET Image Processing
+acronym: IET-IP
+type: journal
+area: CV/doc analysis
+publisher_or_organizer: Wiley / IET
+official_url: https://ietresearch.onlinelibrary.wiley.com/journal/17519667
+venue_family:
+- '5'
+venue_family_labels:
+- Document analysis / OCR / HTR / document AI
+scope_summary: Applied CV/HTR/DocAI with solid experimentation.
+quartile_or_rank: Best quartile Q2; SJR≈0.51; IS≈2.73
+ranking_source: ResearchBite/Scimago[web:158][web:155][web:161][web:164]
+indexing: Scopus; Web of Science
+q1_accessibility:
+  class: strong Q2
+  rationale: Well-indexed, moderate SJR; good for applied CV and doc-analysis.
+  confidence: high
+realistic_publication_chance: reasonable
+recommended_submission_strategy: realistic Q2 fallback
+difficulty: medium–high
+best_for: computer vision, document analysis
+desk_reject_risks: Medium if scope mismatch (education-only or pure chemometrics).
+relevance_to_my_fields: Applied CV/HTR/DocAI with solid experimentation.
+paper_profiles_supported:
+- computer vision
+- HTR/OCR/document analysis
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: medium (not verified)
+  expected_review_rounds: likely 1–2
+  fast_track_available: 'no'
+  online_first_available: online first
+  timeline_confidence: low
+  timeline_source: not verified
+review_rigor: moderate–rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: medium–high
+notes_on_publication_delay: https://www.researchbite.com/impact/details/5400152646[web:158];
+  https://www.scimagojr.com/journalsearch.php?q=5400152646&tip=sid[web:164]
+recent_related_papers: Good “workhorse” Q2 venue for CV/HTR/DocAI.
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv

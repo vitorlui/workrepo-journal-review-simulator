@@ -1,0 +1,58 @@
+venue_id: jsa
+source_ref: V21 from perplexity_final_response2.csv
+name: Journal of Systems Architecture
+acronym: JSA
+type: journal
+area: computer architecture / embedded / systems
+publisher_or_organizer: Elsevier
+official_url: https://www.sciencedirect.com/journal/journal-of-systems-architecture
+venue_family:
+- '1'
+venue_family_labels:
+- Computer architecture / HPC / cloud / distributed systems
+scope_summary: Arquitecturas heterogéneas, RISC-V, seguridad hardware, energía en
+  arquitecturas.[web:199]
+quartile_or_rank: Q1 in Computer Science (hardware/architecture related) in recent
+  Scimago years (exact table en SCImago).
+ranking_source: Scimago profile for JSA[web:199]
+indexing: Scopus; probablemente Web of Science (verificar en WoS).
+q1_accessibility:
+  class: strong Q1
+  rationale: Journal centrada en diseño de arquitecturas y sistemas embebidos; SJR
+    alto dentro de arquitectura/sistemas.[web:199]
+  confidence: medium
+realistic_publication_chance: moderate
+recommended_submission_strategy: realistic Q1 target
+difficulty: high
+best_for: architecture; systems
+desk_reject_risks: Media si el trabajo es puramente cloud/ML sin conexión a arquitectura.
+relevance_to_my_fields: Arquitecturas heterogéneas, RISC-V, seguridad hardware, energía
+  en arquitecturas.[web:199]
+paper_profiles_supported:
+- architecture
+- sustainability/energy
+- hardware security
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: medium (estimado)
+  expected_review_rounds: likely 2 rounds
+  fast_track_available: 'no'
+  online_first_available: yes (Elsevier online first)
+  timeline_confidence: low
+  timeline_source: no estadísticas públicas claras; baso la clasificación en SJR y
+    prácticas Elsevier.
+review_rigor: rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: medium
+notes_on_publication_delay: buscar artículos recientes de RISC-V, seguridad hardware,
+  green architectures en JSA.
+recent_related_papers: https://www.scimagojr.com/journalsearch.php?q=12398&tip=sid[web:199]
+verification_links: Buena opción para trabajos más de arquitectura que de cloud puro.
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response2.csv

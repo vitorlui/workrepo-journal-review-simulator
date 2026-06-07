@@ -1,0 +1,33 @@
+# External AI engines for manual prompt/response workflow (Steps 6-8).
+engines:
+  - id: chatgpt
+    name: ChatGPT
+    mode: manual_external_prompt
+    prompt_template: prompts/external_engines/chatgpt/prompt_template.md
+  - id: claude
+    name: Claude
+    mode: manual_external_prompt
+    prompt_template: prompts/external_engines/claude/prompt_template.md
+  - id: gemini
+    name: Gemini
+    mode: manual_external_prompt
+    prompt_template: prompts/external_engines/gemini/prompt_template.md
+  - id: perplexity
+    name: Perplexity
+    mode: manual_external_prompt
+    prompt_template: prompts/external_engines/perplexity/prompt_template.md
+  - id: notebooklm
+    name: NotebookLM
+    mode: manual_external_prompt
+    prompt_template: prompts/external_engines/notebooklm/prompt_template.md
+
+# Internal engines (configured in model_config.yaml).
+internal_modes:
+  - manual_external_prompt
+  - autonomous_local        # ollama
+  - autonomous_claude_code  # claude
+  - hybrid
+
+defaults:
+  internal_pipeline_engine: template   # offline by default
+  external_engines_mode: manual_external_prompt

@@ -1,0 +1,54 @@
+venue_id: ietb
+source_ref: V10 from perplexity_final_response1.csv
+name: IET Biometrics
+acronym: IETB
+type: journal
+area: biometrics
+publisher_or_organizer: Wiley / IET
+official_url: https://ietresearch.onlinelibrary.wiley.com/journal/20474946
+venue_family:
+- '4'
+venue_family_labels:
+- Biometrics / face anti-spoofing / PAD / security
+scope_summary: Lightweight/real-time FAS, explainable FAS, biometric security systems.
+quartile_or_rank: Q2 in CVPR; IF≈2.45; SJR≈0.65
+ranking_source: Scimago/Resurchify[web:118][web:116][web:110]
+indexing: Scopus; Web of Science[web:122]
+q1_accessibility:
+  class: strong Q2
+  rationale: Specialized biometric venue with good but not top-tier metrics.
+  confidence: high
+realistic_publication_chance: reasonable
+recommended_submission_strategy: realistic Q2 fallback
+difficulty: medium–high
+best_for: biometrics/security (PAD, FAS, template protection)
+desk_reject_risks: Medium if outside biometrics (pure cloud/edtech/agri).
+relevance_to_my_fields: Lightweight/real-time FAS, explainable FAS, biometric security
+  systems.
+paper_profiles_supported:
+- biometrics/security
+- software/platform
+publication_timeline:
+  time_to_first_decision: not verified (only anecdotal 33 weeks)
+  time_to_acceptance: ≈33 weeks avg review cycle from Chinese summary (unofficial)[web:110]
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: medium (≈8 months, low-confidence)
+  expected_review_rounds: likely 1–2
+  fast_track_available: 'no'
+  online_first_available: online first
+  timeline_confidence: low
+  timeline_source: author reports on Chinese site (low–medium)
+review_rigor: rigorous–moderate
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: medium if speed is crucial
+notes_on_publication_delay: https://www.scimagojr.com/journalsearch.php?q=21100216567&tip=sid[web:118];
+  https://www.researchbite.com/impact/details/21100216567[web:116]
+recent_related_papers: Good specialist home for strong FAS/PAD with reasonable acceptance
+  chance.
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv

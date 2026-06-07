@@ -1,0 +1,52 @@
+# Scoring rubric dimensions used by reviewers and the editor synthesis.
+# Scores are 1-10 per dimension. The editor MUST NOT mechanically average.
+
+dimensions:
+  - id: scope_fit
+    label: Scope / venue fit
+  - id: novelty
+    label: Novelty & positioning vs state of the art
+  - id: technical_quality
+    label: Technical / methodological quality
+  - id: experimental_validation
+    label: Experimental validation
+  - id: reproducibility
+    label: Reproducibility
+  - id: clarity
+    label: Clarity & presentation
+  - id: impact
+    label: Scientific impact / significance
+  - id: ethics_integrity
+    label: Ethics & integrity
+
+recommendations:
+  - accept
+  - minor revision
+  - major revision
+  - reject
+  - desk reject risk
+
+final_decisions:
+  - desk reject
+  - reject
+  - major revision
+  - minor revision
+  - accept
+
+confidence_levels:
+  - high
+  - medium
+  - low
+  - NOT_VERIFIED
+
+# Indicative thresholds for the editor (guidance, not an auto-average).
+editor_guidance:
+  desk_reject_below: 4.0
+  reject_below: 5.0
+  major_revision_below: 6.5
+  minor_revision_below: 8.0
+  accept_from: 8.0
+  note: >
+    These are orientation bands only. The editor must synthesize disagreements,
+    identify decisive weaknesses and real strengths, and justify the decision in
+    prose rather than averaging reviewer scores.

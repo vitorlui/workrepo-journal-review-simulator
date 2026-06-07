@@ -1,0 +1,52 @@
+venue_id: toce
+source_ref: V16 from perplexity_final_response1.csv
+name: ACM Transactions on Computing Education
+acronym: TOCE
+type: journal
+area: CS education
+publisher_or_organizer: ACM
+official_url: https://dl.acm.org/journal/toce
+venue_family:
+- strong Q1
+venue_family_labels:
+- strong Q1
+scope_summary: computing education; engineering education; systematic review
+quartile_or_rank: Q1 in CS(misc.) and Education; SJR≈0.78; CiteScore≈7.2[web:10][web:22][web:13][web:19]
+ranking_source: Scopus; Web of Science
+indexing: '7'
+q1_accessibility:
+  class: Flagship CS-ed journal; smaller volume than C&E/EAIT; rigorous.
+  rationale: high
+  confidence: low–moderate
+realistic_publication_chance: ambitious/realistic Q1
+recommended_submission_strategy: very high
+difficulty: computing education, CS1/CS2, curriculum guidelines (ACM/IEEE), systematic
+  reviews
+best_for: High if weak study design or very narrow population.
+desk_reject_risks: CS1, CT, architecture education, RISC-V education.
+relevance_to_my_fields: computing education; engineering education; systematic review
+paper_profiles_supported:
+- not verified
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: slow (likely >9 months; not verified)
+  publication_speed_category: very rigorous
+  expected_review_rounds: 'no'
+  fast_track_available: online
+  online_first_available: 'no'
+  timeline_confidence: not verified
+  timeline_source: low
+review_rigor: likely 2–3
+data_descriptor_format_available: 'no'
+software_article_format_available: low
+suitability_if_fast_publication_needed: https://journalsearches.com/journal.php?title=acm+transactions+on+computing+education[web:10];
+  https://www.scimagojr.com/journalsearch.php?q=19700183047&tip=sid[web:22]
+notes_on_publication_delay: Primary outlet for CS-ed work.
+recent_related_papers: UNKNOWN
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv

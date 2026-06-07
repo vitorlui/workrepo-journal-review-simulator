@@ -1,0 +1,84 @@
+# Registry of reviewer profiles. The canonical rubric text lives in
+# data/global_knowledge/reviewer_profiles/<id>.md (C8). This file only maps
+# each profile to its agent file and the research areas that activate it.
+
+main_reviewers:
+  - id: reviewer-methodology
+    title: "Reviewer 1 — Methodology & experimental validity"
+    profile_md: data/global_knowledge/reviewer_profiles/reviewer-methodology.md
+    agent: .claude/agents/reviewer-methodology.md
+    default_enabled: true
+  - id: reviewer-domain
+    title: "Reviewer 2 — Domain expert & state of the art"
+    profile_md: data/global_knowledge/reviewer_profiles/reviewer-domain.md
+    agent: .claude/agents/reviewer-domain.md
+    default_enabled: true
+  - id: reviewer-systems-architecture
+    title: "Reviewer 3 — Systems, architecture & implementation"
+    profile_md: data/global_knowledge/reviewer_profiles/reviewer-systems-architecture.md
+    agent: .claude/agents/reviewer-systems-architecture.md
+    default_enabled: true
+  - id: reviewer-reproducibility
+    title: "Reviewer 4 — Reproducibility & empirical robustness"
+    profile_md: data/global_knowledge/reviewer_profiles/reviewer-reproducibility.md
+    agent: .claude/agents/reviewer-reproducibility.md
+    default_enabled: true
+  - id: reviewer-scientific-impact
+    title: "Reviewer 5 — Scientific impact & editorial strategy"
+    profile_md: data/global_knowledge/reviewer_profiles/reviewer-scientific-impact.md
+    agent: .claude/agents/reviewer-scientific-impact.md
+    default_enabled: true
+
+specialized_reviewers:
+  - id: reviewer-document-ai-htr
+    title: "Specialized — Document AI / HTR / OCR"
+    profile_md: data/global_knowledge/reviewer_profiles/reviewer-document-ai-htr.md
+    agent: .claude/agents/reviewer-document-ai-htr.md
+    activation_areas: [document_ai_htr]
+  - id: reviewer-education-research
+    title: "Specialized — Education research"
+    profile_md: data/global_knowledge/reviewer_profiles/reviewer-education-research.md
+    agent: .claude/agents/reviewer-education-research.md
+    activation_areas: [education]
+  - id: reviewer-dataset-benchmark
+    title: "Specialized — Dataset / benchmark / data descriptor"
+    profile_md: data/global_knowledge/reviewer_profiles/reviewer-dataset-benchmark.md
+    agent: .claude/agents/reviewer-dataset-benchmark.md
+    activation_areas: [dataset_benchmark]
+  - id: reviewer-spectral-agri-food
+    title: "Specialized — Spectral / agri / food safety"
+    profile_md: data/global_knowledge/reviewer_profiles/reviewer-spectral-agri-food.md
+    agent: .claude/agents/reviewer-spectral-agri-food.md
+    activation_areas: [agri_food_spectral]
+  - id: reviewer-fas-biometrics-security
+    title: "Specialized — FAS / biometrics / security"
+    profile_md: data/global_knowledge/reviewer_profiles/reviewer-fas-biometrics-security.md
+    agent: .claude/agents/reviewer-fas-biometrics-security.md
+    activation_areas: [fas_biometrics_security]
+  - id: reviewer-cloud-hpc-scheduling
+    title: "Specialized — Cloud / HPC / scheduling"
+    profile_md: data/global_knowledge/reviewer_profiles/reviewer-cloud-hpc-scheduling.md
+    agent: .claude/agents/reviewer-cloud-hpc-scheduling.md
+    activation_areas: [cloud_systems_architecture]
+
+auditors:
+  - id: format-compliance-checker
+    title: "Format compliance checker"
+    profile_md: data/global_knowledge/reviewer_profiles/format-compliance-checker.md
+    agent: .claude/agents/format-compliance-checker.md
+    default_enabled: true
+  - id: integrity-ai-use-auditor
+    title: "Integrity / AI-use auditor"
+    profile_md: data/global_knowledge/reviewer_profiles/integrity-ai-use-auditor.md
+    agent: .claude/agents/integrity-ai-use-auditor.md
+    default_enabled: true
+
+# Area keys used by classify.py to decide which specialized reviewers activate.
+area_keys:
+  - cloud_systems_architecture
+  - ml_cv_robust
+  - fas_biometrics_security
+  - document_ai_htr
+  - education
+  - agri_food_spectral
+  - dataset_benchmark

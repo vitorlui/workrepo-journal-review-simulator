@@ -1,0 +1,70 @@
+# Pipeline configuration. Read by worker/pipeline_runner.py.
+
+# Maximum clarification iterations an agent may request from the user.
+max_clarification_iterations: 3
+
+# Default internal engine for autonomous review (overridden by PIPELINE_ENGINE env).
+# One of: template | claude | ollama
+default_engine: template
+
+# Ordered pipeline steps mapped to wizard steps (0..13).
+steps:
+  - id: init                       # Step 0  - create review + tree
+    wizard_step: 0
+  - id: validate_upload            # Step 1  - safe upload validation
+    wizard_step: 1
+  - id: extract                    # Step 2  - manuscript extraction
+    wizard_step: 2
+  - id: classify                   # Step 3  - area & paper type
+    wizard_step: 3
+  - id: scan_venues                # Step 4  - index venue markdowns
+    wizard_step: 4
+  - id: discover_venues            # Step 4  - rank candidate venues
+    wizard_step: 4
+  - id: venue_fit                  # Step 4  - venue fit report
+    wizard_step: 4
+  - id: timeline                   # Step 4  - venue timeline report
+    wizard_step: 4
+  - id: desk_reject_precheck       # Step 5  - early editorial screening
+    wizard_step: 5
+  - id: literature_queries         # Step 6 helper - literature query gen
+    wizard_step: 6
+  - id: generate_external_prompts  # Step 7  - external prompts
+    wizard_step: 7
+  - id: import_external_responses  # Step 8  - external responses
+    wizard_step: 8
+  - id: review                     # Step 9  - main reviewers
+    wizard_step: 9
+  - id: specialized_review         # Step 9  - specialized reviewers
+    wizard_step: 9
+  - id: integrity                  # Step 10 - integrity / AI-use audit
+    wizard_step: 10
+  - id: editorial_decision         # Step 11 - editor-in-chief
+    wizard_step: 11
+  - id: export                     # Step 13 - final export
+    wizard_step: 13
+
+# "full_review" runs this ordered subset end to end.
+full_review_sequence:
+  - extract
+  - classify
+  - scan_venues
+  - discover_venues
+  - venue_fit
+  - timeline
+  - desk_reject_precheck
+  - generate_external_prompts
+  - review
+  - specialized_review
+  - integrity
+  - editorial_decision
+  - export
+
+# Critical guardrails surfaced to every agent prompt.
+guardrails:
+  - "Never invent references, quartiles, rankings, impact factors, CiteScore, SJR, h-index, acceptance rates, or review/publication times."
+  - "If information is missing, write UNKNOWN, NOT_VERIFIED, MISSING, or NEEDS_USER_INPUT."
+  - "Separate manuscript evidence, reviewer inference, external verified data, and missing information."
+  - "If literature data is missing, mark novelty assessment as provisional."
+  - "If venue data is incomplete, mark venue-fit assessment as provisional."
+  - "This is a pre-submission simulator, not real peer review."

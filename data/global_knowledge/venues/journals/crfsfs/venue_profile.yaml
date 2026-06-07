@@ -1,0 +1,55 @@
+venue_id: crfsfs
+source_ref: V32 from perplexity_final_response2.csv
+name: Comprehensive Reviews in Food Science and Food Safety
+acronym: CRFSFS
+type: journal
+area: food safety / reviews
+publisher_or_organizer: Wiley / IFT
+official_url: https://ift.onlinelibrary.wiley.com/journal/15414337
+venue_family:
+- '11'
+venue_family_labels:
+- Food safety / food quality / chemometrics
+scope_summary: Revisiones sobre micotoxinas, HSI en seguridad alimentaria, métodos
+  de detección, etc.
+quartile_or_rank: Q1 en Food Science & Technology; percentil muy alto.[web:205]
+ranking_source: Scimago 2024[web:205]
+indexing: Scopus; Web of Science.
+q1_accessibility:
+  class: elite/strong Q1
+  rationale: Revista de revisiones de altísimo impacto en ciencia y seguridad alimentaria.[web:205]
+  confidence: high
+realistic_publication_chance: low–moderate
+recommended_submission_strategy: ambitious target
+difficulty: very high
+best_for: food safety/chemometrics; systematic review
+desk_reject_risks: Alta si no es realmente una revisión sistemática/estado del arte
+  profundo.
+relevance_to_my_fields: Revisiones sobre micotoxinas, HSI en seguridad alimentaria,
+  métodos de detección, etc.
+paper_profiles_supported:
+- food safety/chemometrics
+- hyperspectral imaging
+- systematic review
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: slow–medium (estimado; revisiones largas)
+  expected_review_rounds: likely 2–3 rounds
+  fast_track_available: 'no'
+  online_first_available: 'yes'
+  timeline_confidence: low
+  timeline_source: no métricas oficiales de tiempos.
+review_rigor: very rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: low
+notes_on_publication_delay: ver Scimago / IFT para impacto exacto.
+recent_related_papers: https://www.scimagojr.com/journalsearch.php?q=4900152301&tip=sid[web:205]
+verification_links: Buen lugar para una revisión grande sobre HSI + DON + quimiometría.
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response2.csv

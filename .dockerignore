@@ -1,0 +1,16 @@
+# Keep build contexts small.
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+.venv
+venv
+apps/web/node_modules
+apps/web/.next
+node_modules
+.git
+data/reviews
+data/uploads
+data/jrs_local.db
+*.log

@@ -1,0 +1,57 @@
+# Safe-upload policy. Enforced by worker/file_ingestion.py.
+max_upload_mb: 50
+
+# Allowed file extensions (lowercase, with dot).
+allowed_extensions:
+  - .pdf
+  - .docx
+  - .md
+  - .tex
+  - .zip
+  - .bib
+  - .csv
+  - .yaml
+  - .yml
+  - .json
+  - .txt
+
+# Accepted magic-byte / MIME signatures per extension family.
+# Validation is best-effort: text formats (.md/.tex/.bib/.csv/.yaml/.json/.txt)
+# have no reliable magic bytes, so they pass on extension + UTF-8 decodability.
+mime_groups:
+  pdf: ["application/pdf"]
+  docx:
+    - "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    - "application/zip" # docx is a zip container
+  zip: ["application/zip", "application/x-zip-compressed"]
+  text: ["text/plain", "text/markdown", "text/csv", "application/json", "text/x-tex"]
+
+# Extensions treated as plain UTF-8 text (no binary magic check).
+text_extensions: [.md, .tex, .bib, .csv, .yaml, .yml, .json, .txt]
+
+# ZIP sandbox rules.
+zip_policy:
+  max_entries: 5000
+  max_uncompressed_mb: 500
+  # Reject entries whose path escapes the extraction root or is absolute.
+  block_path_traversal: true
+  block_absolute_paths: true
+  block_symlinks: true
+  # Extensions never allowed inside an uploaded ZIP.
+  blocked_inner_extensions:
+    - .exe
+    - .dll
+    - .so
+    - .dylib
+    - .bat
+    - .cmd
+    - .com
+    - .msi
+    - .scr
+    - .ps1
+    - .sh
+    - .jar
+    - .app
+    - .bin
+  # Warn (but keep) on hidden/dotfiles inside the archive.
+  warn_on_hidden_files: true

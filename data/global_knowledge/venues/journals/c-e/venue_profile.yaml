@@ -1,0 +1,53 @@
+venue_id: c-e
+source_ref: V13 from perplexity_final_response1.csv
+name: Computers & Education
+acronym: C&E
+type: journal
+area: EdTech / CS Ed
+publisher_or_organizer: Elsevier
+official_url: https://www.sciencedirect.com/journal/computers-and-education
+venue_family:
+- elite Q1
+venue_family_labels:
+- elite Q1
+scope_summary: educational technology; computing education; systematic review
+quartile_or_rank: Q1 in Education and CS Applications; very high IF and h-index[web:12][web:21][web:77]
+ranking_source: Scopus; Web of Science
+indexing: 6,7
+q1_accessibility:
+  class: Leading EdTech journal; extremely competitive.
+  rationale: high
+  confidence: low
+realistic_publication_chance: ambitious target
+recommended_submission_strategy: very high
+difficulty: educational technology, computing education systematic reviews
+best_for: High if weak methodology or small, uncontrolled studies.
+desk_reject_risks: CS1, K–12 computing, CT, AI-supported programming, robust evaluation,
+  PRISMA reviews.
+relevance_to_my_fields: educational technology; computing education; systematic review
+paper_profiles_supported:
+- not verified
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: slow (likely >9 months; not verified)
+  publication_speed_category: very rigorous
+  expected_review_rounds: 'no'
+  fast_track_available: 'yes'
+  online_first_available: 'no'
+  timeline_confidence: not verified
+  timeline_source: low
+review_rigor: likely 2–3
+data_descriptor_format_available: 'no'
+software_article_format_available: low
+suitability_if_fast_publication_needed: https://www.scimagojr.com/journalsearch.php?q=17645&tip=sid[web:12];
+  bibliometric analyses showing Q1 dominance[web:70][web:73]
+notes_on_publication_delay: Your top option for high-impact EdTech/CS‑ed work, but
+  very demanding.
+recent_related_papers: UNKNOWN
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv

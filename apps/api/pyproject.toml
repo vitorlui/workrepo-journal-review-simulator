@@ -1,0 +1,26 @@
+[project]
+name = "journal-review-simulator-api"
+version = "0.1.0"
+description = "FastAPI backend for the journal-review-simulator (thin layer over worker/)."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "python-multipart>=0.0.20",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    "SQLAlchemy>=2.0",
+    "psycopg[binary]>=3.2",
+    "PyYAML>=6.0",
+    "pypdf>=5.1",
+    "python-docx>=1.1",
+    "filetype>=1.2",
+    "Markdown>=3.7",
+]
+
+[project.optional-dependencies]
+pdf = ["weasyprint>=63"]
+dev = ["pytest>=8.3"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

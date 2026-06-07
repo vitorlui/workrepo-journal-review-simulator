@@ -1,0 +1,55 @@
+venue_id: food-control
+source_ref: V31 from perplexity_final_response2.csv
+name: Food Control
+acronym: Food Control
+type: journal
+area: food safety / quality
+publisher_or_organizer: Elsevier
+official_url: https://www.sciencedirect.com/journal/food-control
+venue_family:
+- '11'
+venue_family_labels:
+- Food safety / food quality / chemometrics
+scope_summary: Detección de micotoxinas, control de calidad de cereales, modelos de
+  riesgo, protocolos de muestreo.
+quartile_or_rank: Q1 en Food Science & Technology (percentil alto).[web:207]
+ranking_source: Scimago 2023–2024[web:207]
+indexing: Scopus; Web of Science.
+q1_accessibility:
+  class: strong Q1
+  rationale: Revista sólida en control de calidad y seguridad alimentaria, Q1 estable.[web:207]
+  confidence: high
+realistic_publication_chance: moderate
+recommended_submission_strategy: ambitious/realistic Q1
+difficulty: high
+best_for: food safety/chemometrics; food quality
+desk_reject_risks: Media si el trabajo es muy ML pero sin narrativa clara de seguridad
+  alimentaria.
+relevance_to_my_fields: Detección de micotoxinas, control de calidad de cereales,
+  modelos de riesgo, protocolos de muestreo.
+paper_profiles_supported:
+- food safety/chemometrics
+- agriculture/remote sensing
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: medium (estimado)
+  expected_review_rounds: likely 2 rounds
+  fast_track_available: 'no'
+  online_first_available: 'yes'
+  timeline_confidence: low
+  timeline_source: no tiempos oficiales; Elsevier Q1 típico.
+review_rigor: rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: medium
+notes_on_publication_delay: ver tabla de categorías en Scimago (Food Control Q1).[web:207]
+recent_related_papers: https://www.scimagojr.com/journalsearch.php?q=22577&tip=sid[web:207]
+verification_links: Complemento natural a Food Chemistry para trabajos más de control
+  y regulación.
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response2.csv

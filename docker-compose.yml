@@ -1,0 +1,78 @@
+# journal-review-simulator — local reproducible stack.
+# Markdown/YAML under ./data is bind-mounted so the semantic memory is visible
+# on the host. Postgres + ollama use named volumes.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-jrs}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-jrs_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-journal_review}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-jrs} -d ${POSTGRES_DB:-journal_review}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-jrs}:${POSTGRES_PASSWORD:-jrs_dev_password}@postgres:5432/${POSTGRES_DB:-journal_review}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      DATA_DIR: /app/data
+      PIPELINE_ENGINE: ${PIPELINE_ENGINE:-template}
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ["sleep", "infinity"]   # idle; run CLI via: docker compose exec worker python scripts/run_pipeline.py ...
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-jrs}:${POSTGRES_PASSWORD:-jrs_dev_password}@postgres:5432/${POSTGRES_DB:-journal_review}
+      DATA_DIR: /app/data
+      PIPELINE_ENGINE: ${PIPELINE_ENGINE:-template}
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    environment:
+      # Browser-reachable API URL (host port), not the in-network hostname.
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  # Optional local models. Enable with:  docker compose --profile ollama up
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["ollama"]
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+
+volumes:
+  postgres_data:
+  ollama_data:

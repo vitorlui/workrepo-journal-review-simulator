@@ -1,0 +1,59 @@
+venue_id: toe
+source_ref: V24 from perplexity_final_response2.csv
+name: IEEE Transactions on Education
+acronym: ToE
+type: journal
+area: engineering & computing education
+publisher_or_organizer: IEEE
+official_url: https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=13
+venue_family:
+- '7'
+- '8'
+- '9'
+venue_family_labels:
+- Computing education / CS education
+- Engineering education
+- Agricultural AI / precision agriculture
+scope_summary: Educación en arquitectura, RISC‑V, hardware security, CS1/CS2, evaluaciones
+  curriculares.[web:217]
+quartile_or_rank: Q1 en Education; Q2 en Electrical & Electronic Engineering; SJR≈0.76.[web:209][web:212][web:220][web:23]
+ranking_source: Scimago + Resurchify 2024[web:23][web:220]
+indexing: Scopus; Web of Science.[web:23]
+q1_accessibility:
+  class: strong Q1
+  rationale: Transacciones históricas de educación en ingeniería/EE/CS; bien posicionada
+    en Education.[web:23][web:217]
+  confidence: high
+realistic_publication_chance: moderate
+recommended_submission_strategy: realistic Q1 target
+difficulty: high
+best_for: engineering education; computing education; curriculum/innovación docente
+desk_reject_risks: Media si el trabajo es puramente ML/CV sin foco educativo.
+relevance_to_my_fields: Educación en arquitectura, RISC‑V, hardware security, CS1/CS2,
+  evaluaciones curriculares.[web:217]
+paper_profiles_supported:
+- computing education
+- engineering education
+- educational technology
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: medium (estimado)
+  expected_review_rounds: likely 2 rounds
+  fast_track_available: 'no'
+  online_first_available: 'yes'
+  timeline_confidence: low
+  timeline_source: no datos oficiales de tiempos; reseñas describen revisión exigente.[web:217]
+review_rigor: rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: medium
+notes_on_publication_delay: ver fichas de impacto y SJR en Resurchify/AskBisht.[web:209][web:220][web:212]
+recent_related_papers: https://www.scimagojr.com/journalsearch.php?q=17344&tip=sid[web:23]
+verification_links: Muy adecuada para educación en arquitectura y hardware security.
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response2.csv

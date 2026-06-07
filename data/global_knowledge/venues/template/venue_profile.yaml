@@ -1,0 +1,48 @@
+# Venue profile template. Copy into
+# data/global_knowledge/venues/journals/<venue_id>/venue_profile.yaml
+# Keep UNKNOWN / not verified for anything that is not confirmed. Never invent metrics.
+venue_id: UNKNOWN
+source_ref: ""
+name: UNKNOWN
+acronym: UNKNOWN
+type: journal_or_conference
+area: UNKNOWN
+publisher_or_organizer: UNKNOWN
+official_url: UNKNOWN
+venue_family: []          # numeric family codes, e.g. ["2", "3", "4"]
+venue_family_labels: []
+scope_summary: UNKNOWN
+quartile_or_rank: UNKNOWN
+ranking_source: UNKNOWN
+indexing: UNKNOWN
+q1_accessibility:
+  class: UNKNOWN          # elite Q1 | strong Q1 | mid-tier Q1 | accessible Q1 | borderline Q1/Q2 | strong Q2 | unknown
+  rationale: UNKNOWN
+  confidence: UNKNOWN     # high | medium | low | unknown
+realistic_publication_chance: UNKNOWN
+recommended_submission_strategy: UNKNOWN
+difficulty: UNKNOWN
+best_for: UNKNOWN
+desk_reject_risks: UNKNOWN
+relevance_to_my_fields: UNKNOWN
+paper_profiles_supported: []
+publication_timeline:
+  time_to_first_decision: UNKNOWN
+  time_to_acceptance: UNKNOWN
+  time_acceptance_to_online: UNKNOWN
+  estimated_total_publication_time: UNKNOWN
+  publication_speed_category: UNKNOWN   # very fast | fast | medium | slow | very slow | unknown
+  expected_review_rounds: UNKNOWN
+  fast_track_available: UNKNOWN
+  online_first_available: UNKNOWN
+  timeline_confidence: UNKNOWN
+  timeline_source: UNKNOWN
+review_rigor: UNKNOWN     # very rigorous | rigorous | moderate | accessible
+data_descriptor_format_available: UNKNOWN
+software_article_format_available: UNKNOWN
+suitability_if_fast_publication_needed: UNKNOWN
+notes_on_publication_delay: UNKNOWN
+recent_related_papers: UNKNOWN
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN

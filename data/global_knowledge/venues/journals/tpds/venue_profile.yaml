@@ -1,0 +1,59 @@
+venue_id: tpds
+source_ref: V1 from perplexity_final_response1.csv
+name: IEEE Transactions on Parallel and Distributed Systems
+acronym: TPDS
+type: journal
+area: architecture/HPC/cloud
+publisher_or_organizer: IEEE Computer Society
+official_url: https://www.computer.org/csdl/journal/td
+venue_family:
+- '1'
+venue_family_labels:
+- Computer architecture / HPC / cloud / distributed systems
+scope_summary: Cloud scheduling, datacenter simulation, energy-aware computing, heterogeneous
+  architectures
+quartile_or_rank: Q1 in Computational Theory & Mathematics, Hardware & Architecture,
+  Signal Processing; SJR≈2.10
+ranking_source: Scimago/Resurchify 2024–2025[web:30][web:39]
+indexing: Scopus; Web of Science[web:42]
+q1_accessibility:
+  class: elite Q1
+  rationale: Flagship parallel/distributed systems journal with very high SJR and
+    h-index; widely regarded as top-tier.
+  confidence: high
+realistic_publication_chance: low–moderate
+recommended_submission_strategy: ambitious target
+difficulty: very high
+best_for: architecture, cloud/system implementation, sustainability/energy
+desk_reject_risks: High if scope mismatch (pure theory ML, narrow education focus)
+relevance_to_my_fields: Cloud scheduling, datacenter simulation, energy-aware computing,
+  heterogeneous architectures
+paper_profiles_supported:
+- applied ML
+- cloud/distributed
+- energy-aware computing
+- systems
+- architecture
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: medium–slow (≥6 months, not verified)
+  expected_review_rounds: likely 2 rounds
+  fast_track_available: unknown
+  online_first_available: likely yes (Early Access via IEEE Xplore)
+  timeline_confidence: low
+  timeline_source: not verified (no official stats)
+review_rigor: very rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: low (prestige over speed)
+notes_on_publication_delay: not verified
+recent_related_papers: https://www.researchbite.com/impact/details/26098[web:30];
+  https://www.scimagojr.com/journalsearch.php?q=26098&tip=sid[web:39]
+verification_links: Treat as top-ambition for systems/cloud/green-computing work.
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv

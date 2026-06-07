@@ -1,0 +1,57 @@
+venue_id: tpami
+source_ref: V6 from perplexity_final_response1.csv
+name: IEEE Transactions on Pattern Analysis and Machine Intelligence
+acronym: TPAMI
+type: journal
+area: ML/CV
+publisher_or_organizer: IEEE Computer Society
+official_url: https://www.computer.org/csdl/journal/tp
+venue_family:
+- '2'
+- '3'
+venue_family_labels:
+- Machine learning / AI / deep learning
+- Computer vision / pattern recognition
+scope_summary: Foundational robust CV/ML, OOD theory, major FAS or HTR breakthroughs.
+quartile_or_rank: Q1 in CVPR & AI; extremely high SJR and IF
+ranking_source: Scimago/Resurchify, IEEE metrics[web:53][web:56][web:59][web:65][web:76]
+indexing: Scopus; Web of Science
+q1_accessibility:
+  class: elite Q1
+  rationale: Top CV/ML journal; extremely selective; used for foundational advances.
+  confidence: high
+realistic_publication_chance: very low
+recommended_submission_strategy: ambitious target
+difficulty: very high
+best_for: theoretical, applied AI, computer vision
+desk_reject_risks: Very high if incremental or dataset-only; expects major conceptual
+  contributions.
+relevance_to_my_fields: Foundational robust CV/ML, OOD theory, major FAS or HTR breakthroughs.
+paper_profiles_supported:
+- theoretical
+- applied AI
+- computer vision
+- biometrics/security
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: slow (likely >9 months; not verified)
+  expected_review_rounds: likely 2–3+ rounds
+  fast_track_available: 'no'
+  online_first_available: 'yes'
+  timeline_confidence: low
+  timeline_source: not verified
+review_rigor: very rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: very low (do not use for speed)
+notes_on_publication_delay: https://www.resurchify.com/impact/details/24254[web:53];
+  https://www.scimagojr.com/journalsearch.php?q=24254&tip=sid[web:56]
+recent_related_papers: Use only for truly top-tier contributions.
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv

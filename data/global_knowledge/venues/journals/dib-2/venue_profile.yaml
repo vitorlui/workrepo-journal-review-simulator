@@ -1,0 +1,56 @@
+venue_id: dib-2
+source_ref: V35 from perplexity_final_response2.csv
+name: Data in Brief
+acronym: DiB
+type: journal
+area: data descriptors (multidisciplinar)
+publisher_or_organizer: Elsevier
+official_url: https://www.sciencedirect.com/journal/data-in-brief
+venue_family:
+- '13'
+venue_family_labels:
+- Dataset / benchmark / data descriptor venues
+scope_summary: Datasets de FAS, HTR, HSI, agricultura, educación que acompañan a otro
+  artículo principal.[web:134]
+quartile_or_rank: Mejor cuartil Q2 en Multidisciplinary; SJR≈0.2–0.3.[web:134][web:137][web:140][web:143]
+ranking_source: ResearchBite/Scimago/AskBisht 2023–2025
+indexing: Scopus; Web of Science.[web:140]
+q1_accessibility:
+  class: strong Q2
+  rationale: Journal de datos OA, muy usado para publicar datasets complementarios;
+    menos prestigioso que Scientific Data.[web:134][web:137]
+  confidence: high
+realistic_publication_chance: reasonable
+recommended_submission_strategy: fallback data descriptor target
+difficulty: high
+best_for: dataset/benchmark; data descriptor
+desk_reject_risks: Media si el dataset es muy pequeño o mal documentado.
+relevance_to_my_fields: Datasets de FAS, HTR, HSI, agricultura, educación que acompañan
+  a otro artículo principal.[web:134]
+paper_profiles_supported:
+- dataset/benchmark
+- data descriptor
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: fast–medium (Elsevier indica procesos ágiles, no verificado)
+  expected_review_rounds: likely 1–2 rounds
+  fast_track_available: 'no'
+  online_first_available: 'yes'
+  timeline_confidence: low
+  timeline_source: sin métricas públicas; experiencia comunitaria sugiere tiempos
+    razonables.
+review_rigor: moderate
+data_descriptor_format_available: 'yes'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: high (comparado con SciData)
+notes_on_publication_delay: ver ficha DiB en Scimago/Resurchify/AskBisht.[web:134][web:137][web:143]
+recent_related_papers: https://www.researchbite.com/impact/details/21100372856[web:134]
+verification_links: Buen complemento para datasets cuando el paper principal va a
+  un Q1.
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response2.csv

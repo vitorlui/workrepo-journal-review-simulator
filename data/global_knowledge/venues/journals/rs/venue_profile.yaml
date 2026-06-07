@@ -1,0 +1,62 @@
+venue_id: rs
+source_ref: V29 from perplexity_final_response2.csv
+name: Remote Sensing
+acronym: RS
+type: journal
+area: remote sensing / imaging
+publisher_or_organizer: MDPI
+official_url: https://www.mdpi.com/journal/remotesensing
+venue_family:
+- '9'
+- '10'
+venue_family_labels:
+- Agricultural AI / precision agriculture
+- Hyperspectral imaging / remote sensing
+scope_summary: Teledetección agrícola, HSI, índices espectrales para cultivos, UAV,
+  etc.[web:178][web:184]
+quartile_or_rank: SJR≈1.02; Q1–Q2 en categorías de Remote Sensing (WoS Q2 en algunos
+  listados).[web:178][web:184][web:187]
+ranking_source: Resurchify/Scimago/WoS 2024–2025[web:178][web:184]
+indexing: Scopus; Web of Science.[web:184]
+q1_accessibility:
+  class: strong Q2 / borderline Q1/Q2
+  rationale: Journal OA muy productivo en remote sensing; SJR sólido pero por debajo
+    de RSE.[web:178][web:184]
+  confidence: medium
+realistic_publication_chance: moderate–reasonable
+recommended_submission_strategy: realistic target
+difficulty: high
+best_for: agriculture/remote sensing; HSI; sustainability
+desk_reject_risks: Media si el trabajo es muy incremental; cuidado con calidad metodológica.
+relevance_to_my_fields: Teledetección agrícola, HSI, índices espectrales para cultivos,
+  UAV, etc.[web:178][web:184]
+paper_profiles_supported:
+- agriculture/remote sensing
+- hyperspectral imaging
+- AI for sustainability
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: fast–medium (MDPI suele ser relativamente rápido, pero
+    no verificado)
+  expected_review_rounds: likely 1–2 rounds
+  fast_track_available: 'no'
+  online_first_available: yes (OA, publicación continua)
+  timeline_confidence: low
+  timeline_source: no datos formales; MDPI suele apuntar a 1–2 meses a primera decisión
+    (tomar con cautela).
+review_rigor: moderate–rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: high (comparado con RSE)
+notes_on_publication_delay: ver perfil en Resurchify/Scimago/WoS; revisar APCs y política
+  editorial.[web:178][web:184]
+recent_related_papers: https://www.resurchify.com/impact/details/86430[web:178]
+verification_links: Buena opción para remote sensing agrícola con énfasis aplicado
+  y tiempos razonables.
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response2.csv

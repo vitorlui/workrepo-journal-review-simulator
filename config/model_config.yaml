@@ -1,0 +1,42 @@
+# AI engine / model configuration. Read by worker/agent_orchestrator.py.
+# The MVP default is the offline "template" engine: deterministic Markdown
+# scaffolding with no API keys. The other providers are seams for later.
+
+default_engine: template
+
+engines:
+  template:
+    type: offline
+    description: >
+      Deterministic Markdown scaffolding built from the extracted paper, the
+      venue profile and the reviewer profile. No network, no keys. Confidence
+      is always reported as NOT_VERIFIED.
+
+  claude:
+    type: anthropic_api
+    description: Anthropic Claude API (requires ANTHROPIC_API_KEY).
+    model_env: ANTHROPIC_MODEL
+    default_model: claude-opus-4-8
+    api_key_env: ANTHROPIC_API_KEY
+    enabled: false
+
+  ollama:
+    type: ollama
+    description: Local model via Ollama (optional docker-compose service).
+    host_env: OLLAMA_HOST
+    default_host: http://ollama:11434
+    model_env: OLLAMA_MODEL
+    default_model: llama3.1
+    enabled: false
+
+# Comparison runs (scripts/compare_models.py) write to
+# data/reviews/<review_id>/reviewer_outputs/model_comparison/
+comparison:
+  dimensions:
+    - severity
+    - specificity
+    - hallucination_risk
+    - usefulness
+    - omitted_issues
+    - rubric_consistency
+    - agreement_with_claude

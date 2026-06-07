@@ -1,0 +1,60 @@
+venue_id: ijstem
+source_ref: V27 from perplexity_final_response2.csv
+name: International Journal of STEM Education
+acronym: IJSTEM
+type: journal
+area: STEM / computing / engineering education
+publisher_or_organizer: SpringerOpen
+official_url: https://stemeducationjournal.springeropen.com
+venue_family:
+- '7'
+- '8'
+- '9'
+venue_family_labels:
+- Computing education / CS education
+- Engineering education
+- Agricultural AI / precision agriculture
+scope_summary: Estudios de CT, programación, CS en K–12, educación en arquitectura/CS
+  en clave STEM.[web:216][web:219]
+quartile_or_rank: Q1 en Education; SJR≈2.606; IF≈10.35.[web:211][web:214][web:216][web:219]
+ranking_source: Resurchify + AskBisht + WoS 2024–2025[web:216][web:219]
+indexing: Scopus; Web of Science.[web:219]
+q1_accessibility:
+  class: elite/strong Q1
+  rationale: OA de alto impacto en educación STEM; percentil ~99% en Education.[web:216][web:219]
+  confidence: high
+realistic_publication_chance: moderate
+recommended_submission_strategy: ambitious/realistic Q1
+difficulty: high
+best_for: computing education; engineering education; K–12 STEM
+desk_reject_risks: Alta si el estudio es muy local sin discusión general, o diseño
+  metodológico débil.
+relevance_to_my_fields: Estudios de CT, programación, CS en K–12, educación en arquitectura/CS
+  en clave STEM.[web:216][web:219]
+paper_profiles_supported:
+- computing education
+- engineering education
+- educational technology
+- systematic review
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: medium (estimado)
+  expected_review_rounds: likely 2 rounds
+  fast_track_available: 'no'
+  online_first_available: yes (OA)
+  timeline_confidence: low
+  timeline_source: no tiempos oficiales; impacto alto sugiere revisión exigente.
+review_rigor: rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: medium
+notes_on_publication_delay: ver ficha IJSTEM en Resurchify/AskBisht/WoS.[web:216][web:214][web:219]
+recent_related_papers: https://www.resurchify.com/impact/details/21100873488[web:216]
+verification_links: Muy interesante para trabajos STEM integrando CT/CS + hardware/arquitectura.
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response2.csv

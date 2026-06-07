@@ -1,0 +1,83 @@
+# Venue-discovery importer config. Read by worker/venue_discovery.py.
+# Maps the 39-column Perplexity schema to the venue_profile.yaml structure.
+
+# Canonical column order of the Perplexity CSV / Markdown-table responses.
+columns:
+  - venue_id
+  - name
+  - acronym
+  - type
+  - area
+  - publisher_or_organizer
+  - official_url
+  - quartile_or_rank
+  - ranking_source
+  - indexing
+  - venue_family
+  - q1_accessibility_class
+  - accessibility_rationale
+  - accessibility_confidence
+  - realistic_publication_chance
+  - recommended_submission_strategy
+  - difficulty
+  - best_for
+  - desk_reject_risks
+  - relevance_to_my_fields
+  - paper_profiles_supported
+  - time_to_first_decision
+  - time_to_acceptance
+  - time_acceptance_to_online
+  - estimated_total_publication_time
+  - publication_speed_category
+  - review_rigor
+  - expected_review_rounds
+  - fast_track_available
+  - online_first_available
+  - data_descriptor_format_available
+  - software_article_format_available
+  - timeline_confidence
+  - timeline_source
+  - suitability_if_fast_publication_needed
+  - notes_on_publication_delay
+  - recent_related_papers
+  - verification_links
+  - notes
+
+# Tokens that mean "no verified data". Preserved verbatim; never replaced
+# with invented values.
+missing_tokens:
+  - ""
+  - "unknown"
+  - "not verified"
+  - "not enough information"
+  - "n/a"
+  - "na"
+  - "none"
+
+# Default placeholder written when a column is absent entirely.
+default_placeholder: "UNKNOWN"
+
+# Numeric venue_family code -> human label (from the user's 14 families).
+family_map:
+  "1": "Computer architecture / HPC / cloud / distributed systems"
+  "2": "Machine learning / AI / deep learning"
+  "3": "Computer vision / pattern recognition"
+  "4": "Biometrics / face anti-spoofing / PAD / security"
+  "5": "Document analysis / OCR / HTR / document AI"
+  "6": "Educational technology"
+  "7": "Computing education / CS education"
+  "8": "Engineering education"
+  "9": "Agricultural AI / precision agriculture"
+  "10": "Hyperspectral imaging / remote sensing"
+  "11": "Food safety / food quality / chemometrics"
+  "12": "Domain adaptation / OOD generalization / robust ML"
+  "13": "Dataset / benchmark / data descriptor venues"
+  "14": "Software / reproducibility / open science venues"
+
+# Where imported venues are written.
+output:
+  journals_dir: data/global_knowledge/venues/journals
+  conferences_dir: data/global_knowledge/venues/conferences
+  processed_dir: data/global_knowledge/venue_discovery/processed
+  reports_dir: data/global_knowledge/venue_discovery/import_reports
+  raw_dir: data/global_knowledge/venue_discovery/raw

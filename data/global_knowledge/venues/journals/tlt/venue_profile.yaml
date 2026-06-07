@@ -1,0 +1,52 @@
+venue_id: tlt
+source_ref: V15 from perplexity_final_response1.csv
+name: IEEE Transactions on Learning Technologies
+acronym: TLT
+type: journal
+area: EdTech / learning analytics
+publisher_or_organizer: IEEE
+official_url: https://www.scimagojr.com/journalsearch.php?q=19700167026&tip=sid
+venue_family:
+- strong Q1
+venue_family_labels:
+- strong Q1
+scope_summary: educational technology; computing education
+quartile_or_rank: Q1 in CS Applications, Education, E-learning; SJR≈1.14; IS≈5.7[web:11][web:17][web:14][web:20]
+ranking_source: Scopus; Web of Science[web:20]
+indexing: 6,7
+q1_accessibility:
+  class: High-quality IEEE EdTech venue, strong on learning technologies.
+  rationale: high
+  confidence: moderate
+realistic_publication_chance: ambitious/realistic Q1
+recommended_submission_strategy: high
+difficulty: educational technology, learning analytics
+best_for: Medium if purely qualitative with limited tech.
+desk_reject_risks: AI-supported programming, learning analytics, adaptive systems
+  in CS1.
+relevance_to_my_fields: educational technology; computing education
+paper_profiles_supported:
+- not verified
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: medium (not verified)
+  publication_speed_category: rigorous
+  expected_review_rounds: 'no'
+  fast_track_available: 'yes'
+  online_first_available: 'no'
+  timeline_confidence: not verified
+  timeline_source: medium
+review_rigor: likely 2
+data_descriptor_format_available: 'no'
+software_article_format_available: low
+suitability_if_fast_publication_needed: https://www.researchbite.com/impact/details/19700167026[web:11];
+  https://www.scimagojr.com/journalsearch.php?q=19700167026&tip=sid[web:17]
+notes_on_publication_delay: Good alternative to C&E with strong tech focus.
+recent_related_papers: UNKNOWN
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv

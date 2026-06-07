@@ -1,0 +1,59 @@
+venue_id: jpdc
+source_ref: V3 from perplexity_final_response1.csv
+name: Journal of Parallel and Distributed Computing
+acronym: JPDC
+type: journal
+area: architecture/HPC/cloud
+publisher_or_organizer: Academic Press / Elsevier
+official_url: https://www.sciencedirect.com/journal/journal-of-parallel-and-distributed-computing
+venue_family:
+- '1'
+venue_family_labels:
+- Computer architecture / HPC / cloud / distributed systems
+scope_summary: Parallel/distributed systems, resource allocation, simulation, scheduling,
+  green computing.
+quartile_or_rank: Q1 in Computer Networks & Communications, Hardware & Architecture,
+  Software; AI Q2; SJR≈0.98
+ranking_source: Scimago/Resurchify 2025[web:35]
+indexing: Scopus; Web of Science[web:41]
+q1_accessibility:
+  class: strong Q1
+  rationale: Q1 in core systems categories but below TPDS/FGCS in SJR; good reputation
+    and strong applied focus.
+  confidence: high
+realistic_publication_chance: moderate–reasonable
+recommended_submission_strategy: realistic target
+difficulty: high
+best_for: cloud/system implementation, sustainability/energy
+desk_reject_risks: Medium if not clearly systems-oriented (pure pedagogy or only ML
+  theory).
+relevance_to_my_fields: Parallel/distributed systems, resource allocation, simulation,
+  scheduling, green computing.
+paper_profiles_supported:
+- cloud/distributed
+- energy-aware computing
+- systems
+- software/platform
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: medium (6–9 months, not verified)
+  expected_review_rounds: likely 2 rounds
+  fast_track_available: unknown
+  online_first_available: likely yes
+  timeline_confidence: low
+  timeline_source: not verified
+review_rigor: rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: medium
+notes_on_publication_delay: https://www.resurchify.com/impact/details/25621[web:35]
+recent_related_papers: Strong target for solid, experimental systems work, including
+  CloudSim-based schedulers.
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv

@@ -1,0 +1,54 @@
+venue_id: joss
+source_ref: V22 from perplexity_final_response1.csv
+name: Journal of Open Source Software
+acronym: JOSS
+type: journal
+area: software
+publisher_or_organizer: Open Journals
+official_url: https://joss.theoj.org
+venue_family:
+- '14'
+venue_family_labels:
+- Software / reproducibility / open science venues
+scope_summary: CloudSim/CloudSim Plus extensions, HTR/FAS toolkits, reproducible pipelines.
+quartile_or_rank: No quartile (not in Scimago); peer‑reviewed software journal
+ranking_source: Wikipedia/GitHub discussions[web:135][web:141][web:144]
+indexing: Indexed in some scholarly indices; not (yet) in Web of Science (Clarivate
+  ticket)[web:141]
+q1_accessibility:
+  class: not enough information (re Q‑class)
+  rationale: Widely respected in OSS research community, but not a Q1/Q2 journal.
+  confidence: medium
+realistic_publication_chance: reasonable
+recommended_submission_strategy: software/platform target
+difficulty: medium–high
+best_for: software/platform; reproducibility
+desk_reject_risks: Medium if paper is more ML/HTR/chemometrics science than software.
+relevance_to_my_fields: CloudSim/CloudSim Plus extensions, HTR/FAS toolkits, reproducible
+  pipelines.
+paper_profiles_supported:
+- software/platform
+- reproducibility
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: fast (often weeks; anecdotal)
+  expected_review_rounds: likely 1
+  fast_track_available: 'no'
+  online_first_available: online
+  timeline_confidence: low
+  timeline_source: community reports (unofficial)
+review_rigor: moderate
+data_descriptor_format_available: 'no'
+software_article_format_available: yes (software papers)
+suitability_if_fast_publication_needed: high for speed
+notes_on_publication_delay: https://joss.theoj.org[web:135]; https://en.wikipedia.org/wiki/Journal_of_Open_Source_Software[web:144]
+recent_related_papers: Excellent for making your simulators and toolkits citable,
+  to be combined with a Q1/Q2 "science" paper.
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv

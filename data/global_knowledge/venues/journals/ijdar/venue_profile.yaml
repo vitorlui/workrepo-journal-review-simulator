@@ -1,0 +1,55 @@
+venue_id: ijdar
+source_ref: V11 from perplexity_final_response1.csv
+name: International Journal on Document Analysis and Recognition
+acronym: IJDAR
+type: journal
+area: document analysis/HTR
+publisher_or_organizer: Springer
+official_url: https://www.springer.com/journal/10032
+venue_family:
+- '5'
+- '6'
+venue_family_labels:
+- Document analysis / OCR / HTR / document AI
+- Educational technology
+scope_summary: HTR, multilingual HTR, low-resource HTR datasets, annotation protocols.
+quartile_or_rank: SJR≈0.83; quartile not clearly exposed but likely Q2 in CS/AI
+ranking_source: Resurchify/Scimago[web:81][web:79][web:83]
+indexing: Scopus; Web of Science[web:83][web:85]
+q1_accessibility:
+  class: strong Q2 (medium-confidence)
+  rationale: Core DA/OCR/HTR journal, but SJR lower than PR.
+  confidence: medium
+realistic_publication_chance: reasonable
+recommended_submission_strategy: realistic target
+difficulty: medium
+best_for: HTR/OCR/document analysis, dataset/protocol work
+desk_reject_risks: Medium if work is purely FAS or agri without document angle.
+relevance_to_my_fields: HTR, multilingual HTR, low-resource HTR datasets, annotation
+  protocols.
+paper_profiles_supported:
+- HTR/OCR/document analysis
+- dataset/benchmark
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: medium (not verified)
+  expected_review_rounds: likely 2
+  fast_track_available: 'no'
+  online_first_available: online first
+  timeline_confidence: low
+  timeline_source: not verified
+review_rigor: rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: medium
+notes_on_publication_delay: https://www.resurchify.com/impact/details/130138[web:81];
+  https://www.scimagojr.com/journalsearch.php?q=130138&tip=sid[web:79]
+recent_related_papers: Primary journal for HTR/OCR/document analysis in your portfolio.
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv

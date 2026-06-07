@@ -1,0 +1,68 @@
+venue_id: pr
+source_ref: V4 from perplexity_final_response1.csv
+name: Pattern Recognition
+acronym: PR
+type: journal
+area: ML/CV/biometrics/doc AI
+publisher_or_organizer: Elsevier
+official_url: https://www.sciencedirect.com/journal/pattern-recognition
+venue_family:
+- '2'
+- '3'
+- '4'
+- '6'
+venue_family_labels:
+- Machine learning / AI / deep learning
+- Computer vision / pattern recognition
+- Biometrics / face anti-spoofing / PAD / security
+- Educational technology
+scope_summary: FAS/PAD, robust CV evaluation, document analysis, HTR, domain adaptation,
+  OOD generalization.
+quartile_or_rank: Q1 in Artificial Intelligence, Computer Vision & Pattern Recognition,
+  Signal Processing, Software; SJR≈2.06; IF≈9.8
+ranking_source: Scimago/Resurchify 2024–2025[web:153][web:156][web:160]
+indexing: Scopus; Web of Science[web:162]
+q1_accessibility:
+  class: strong Q1
+  rationale: High SJR and impact, but below TPAMI/IJCV; publishes many strong but
+    applied CV/biometrics/doc-analysis works.
+  confidence: high
+realistic_publication_chance: moderate
+recommended_submission_strategy: ambitious or realistic Q1 (depending on novelty)
+difficulty: high
+best_for: applied AI, computer vision, biometrics/security, HTR/OCR/document analysis,
+  dataset/benchmark
+desk_reject_risks: High if weak evaluation, narrow dataset, or incremental without
+  positioning.
+relevance_to_my_fields: FAS/PAD, robust CV evaluation, document analysis, HTR, domain
+  adaptation, OOD generalization.
+paper_profiles_supported:
+- applied AI
+- computer vision
+- biometrics/security
+- HTR/OCR/document analysis
+- dataset/benchmark
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: medium–slow (not verified)
+  expected_review_rounds: likely 2 rounds
+  fast_track_available: 'no'
+  online_first_available: yes (online first)
+  timeline_confidence: low
+  timeline_source: not verified
+review_rigor: rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: low–medium
+notes_on_publication_delay: https://www.resurchify.com/impact/details/24823[web:156];
+  https://www.scimagojr.com/journalsearch.php?q=24823&tip=sid[web:160]
+recent_related_papers: 'One of your best cross-cutting venues: FAS, HTR, robust evaluation
+  and architecture-aware CV all fit.'
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv

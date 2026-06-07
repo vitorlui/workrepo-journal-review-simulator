@@ -1,0 +1,58 @@
+venue_id: rse
+source_ref: V28 from perplexity_final_response2.csv
+name: Remote Sensing of Environment
+acronym: RSE
+type: journal
+area: remote sensing / Earth observation
+publisher_or_organizer: Elsevier
+official_url: https://www.sciencedirect.com/journal/remote-sensing-of-environment
+venue_family:
+- '9'
+- '10'
+venue_family_labels:
+- Agricultural AI / precision agriculture
+- Hyperspectral imaging / remote sensing
+scope_summary: Clasificación de cultivos, HSI a gran escala, detección de estrés hídrico,
+  mapas de rendimiento y sostenibilidad.[web:180][web:197]
+quartile_or_rank: Q1 en Computers in Earth Sciences, Geology, Soil Science; SJR≈4.06;
+  IF≈11–14.[web:177][web:180][web:200]
+ranking_source: ResearchBite/Resurchify/JournalMetrics 2024–2025[web:177][web:180][web:200]
+indexing: Scopus; Web of Science.[web:186]
+q1_accessibility:
+  class: elite Q1
+  rationale: Revista top en teledetección; SJR e IF muy altos; extremadamente influyente.[web:177][web:180]
+  confidence: high
+realistic_publication_chance: low
+recommended_submission_strategy: ambitious target
+difficulty: very high
+best_for: agriculture/remote sensing; AI for sustainability; hyperspectral imaging
+desk_reject_risks: Alta si enfoque es demasiado CS sin contribución clara a teledetección.
+relevance_to_my_fields: Clasificación de cultivos, HSI a gran escala, detección de
+  estrés hídrico, mapas de rendimiento y sostenibilidad.[web:180][web:197]
+paper_profiles_supported:
+- agriculture/remote sensing
+- hyperspectral imaging
+- AI for sustainability
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: slow–medium (estimado, revista muy demandada)
+  expected_review_rounds: likely 2–3 rounds
+  fast_track_available: 'no'
+  online_first_available: 'yes'
+  timeline_confidence: low
+  timeline_source: no estadísticas formales de tiempos; bibliometría muestra alta
+    demanda.
+review_rigor: very rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: low
+notes_on_publication_delay: ver métricas detalladas en ResearchBite/JournalMetrics/Scimago.[web:177][web:180][web:186][web:197]
+recent_related_papers: https://www.resurchify.com/impact/details/12503[web:180]
+verification_links: Para trabajos de teledetección agrícola de máximo impacto.
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response2.csv

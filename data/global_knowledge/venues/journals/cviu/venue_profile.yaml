@@ -1,0 +1,56 @@
+venue_id: cviu
+source_ref: V23 from perplexity_final_response2.csv
+name: Computer Vision and Image Understanding
+acronym: CVIU
+type: CVIU
+area: journal
+publisher_or_organizer: computer vision / image understanding
+official_url: Elsevier
+venue_family:
+- Scopus
+- Web of Science.
+venue_family_labels:
+- Scopus
+- Web of Science.
+scope_summary: Media si la contribución es muy incremental o fuera de CV.
+quartile_or_rank: https://www.sciencedirect.com/journal/computer-vision-and-image-understanding
+ranking_source: Entre Q1 y Q2 según categoría; SJR intermedio en CV/PR.[web:66]
+indexing: Scimago CVIU[web:66]
+q1_accessibility:
+  class: 3,6
+  rationale: borderline Q1/Q2
+  confidence: Revista fuerte pero algo por debajo de IJCV/PR; buena reputación en
+    CV.[web:66]
+realistic_publication_chance: medium
+recommended_submission_strategy: moderate–reasonable
+difficulty: realistic target
+best_for: medium–high
+desk_reject_risks: computer vision; document analysis; robust CV
+relevance_to_my_fields: Media si la contribución es muy incremental o fuera de CV.
+paper_profiles_supported:
+- CV para doc AI
+- robustez
+- vídeo
+- métodos aplicados más que breakthrough.
+publication_timeline:
+  time_to_first_decision: computer vision; HTR/OCR/document analysis; applied AI
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: not verified
+  expected_review_rounds: rigorous
+  fast_track_available: likely 2 rounds
+  online_first_available: 'no'
+  timeline_confidence: 'no'
+  timeline_source: low
+review_rigor: medium (estimado)
+data_descriptor_format_available: 'yes'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: no datos oficiales de tiempos.
+notes_on_publication_delay: medium
+recent_related_papers: mirar tabla de similitud de Scimago (similar a IJCV, PR, etc.).[web:66]
+verification_links: https://www.scimagojr.com/journalsearch.php?q=24161&tip=sid[web:66]
+notes: Buena alternativa un poco más accesible que IJCV para doc‑AI/robust CV.
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response2.csv

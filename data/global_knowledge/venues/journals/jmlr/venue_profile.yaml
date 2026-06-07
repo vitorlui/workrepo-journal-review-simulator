@@ -1,0 +1,56 @@
+venue_id: jmlr
+source_ref: V8 from perplexity_final_response1.csv
+name: Journal of Machine Learning Research
+acronym: JMLR
+type: journal
+area: ML
+publisher_or_organizer: Microtome Publishing
+official_url: https://www.jmlr.org
+venue_family:
+- '2'
+- '12'
+venue_family_labels:
+- Machine learning / AI / deep learning
+- Domain adaptation / OOD generalization / robust ML
+scope_summary: ML theory of domain adaptation/OOD, representation learning, diagnostics.
+quartile_or_rank: Q1 in AI, Control & Systems Eng, Software, Statistics; SJR≈2.0;
+  h-index 280
+ranking_source: Scimago/ResearchBite[web:61][web:64]
+indexing: Scopus
+q1_accessibility:
+  class: elite Q1
+  rationale: Top ML journal, especially for theoretical work; selective.
+  confidence: high
+realistic_publication_chance: very low for applied-only
+recommended_submission_strategy: ambitious target
+difficulty: very high
+best_for: theoretical, representation learning, robust generalization
+desk_reject_risks: High if mostly applied CV/education/agri without strong ML novelty.
+relevance_to_my_fields: ML theory of domain adaptation/OOD, representation learning,
+  diagnostics.
+paper_profiles_supported:
+- theoretical
+- applied AI
+- dataset/benchmark
+publication_timeline:
+  time_to_first_decision: not verified
+  time_to_acceptance: not verified
+  time_acceptance_to_online: not verified
+  estimated_total_publication_time: not verified
+  publication_speed_category: slow (not verified)
+  expected_review_rounds: likely 2+
+  fast_track_available: 'no'
+  online_first_available: online
+  timeline_confidence: low
+  timeline_source: not verified
+review_rigor: very rigorous
+data_descriptor_format_available: 'no'
+software_article_format_available: 'no'
+suitability_if_fast_publication_needed: very low for speed
+notes_on_publication_delay: https://www.researchbite.com/impact/details/20969[web:58][web:61]
+recent_related_papers: Reserve for ML-centric, theory-heavy work.
+verification_links: UNKNOWN
+notes: UNKNOWN
+last_verified_at: UNKNOWN
+imported_at: '2026-06-07T13:26:59Z'
+import_source: perplexity_final_response1.csv
