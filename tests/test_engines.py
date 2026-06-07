@@ -30,7 +30,7 @@ def test_complete_stdin_substitutes_model(monkeypatch):
     monkeypatch.setattr(cli_engine.shutil, "which", lambda b: "/usr/bin/ollama")
     captured = {}
 
-    def fake_run(argv, stdin=None, input=None, capture_output=True, text=True, timeout=None):
+    def fake_run(argv, stdin=None, input=None, **kw):
         captured["argv"] = argv
         # stdin mode now feeds a real temp-file handle (avoids the pipe race).
         captured["stdin_content"] = stdin.read() if stdin is not None else input

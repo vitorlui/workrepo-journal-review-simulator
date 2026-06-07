@@ -19,18 +19,44 @@ function Mono({ text }: { text: string }) {
   );
 }
 
+function StatusBadge({ status, step }: { status?: string; step?: number }) {
+  const s = status || "created";
+  const running = s.startsWith("running:");
+  const completed = s === "completed";
+  const label = running ? `running · ${s.split(":")[1]}` : s;
+  const cls = running
+    ? "bg-amber-100 text-amber-800"
+    : completed ? "bg-green-100 text-green-800" : "bg-slate-100 text-slate-600";
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}>
+      {running && <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />}
+      {label}{typeof step === "number" ? ` · step ${step}` : ""}
+    </span>
+  );
+}
+
 export default function ReviewWizard({ params }: { params: { id: string } }) {
   const id = params.id;
   const [step, setStep] = useState(0);
   const [review, setReview] = useState<any>(null);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
+  const [auto, setAuto] = useState(true);
+  const [tick, setTick] = useState(0);
 
   const refresh = useCallback(() => {
     api.getReview(id).then(setReview).catch((e) => setMsg(String(e)));
   }, [id]);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  // Live auto-refresh: poll the review and bump a tick so step panels reload —
+  // shows progress even when the pipeline is triggered from the CLI.
+  useEffect(() => {
+    if (!auto) return;
+    const t = setInterval(() => { refresh(); setTick((x) => x + 1); }, 4000);
+    return () => clearInterval(t);
+  }, [auto, refresh]);
 
   async function run(mode: string) {
     // Guard: re-running a review-generating step over an already-generated
@@ -62,11 +88,19 @@ export default function ReviewWizard({ params }: { params: { id: string } }) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold text-ieee-dark">{review?.title || id}</h1>
-          <div className="text-xs text-slate-500">{id} · {review?.status} · {review?.submission_type}</div>
+          <div className="text-xs text-slate-500 flex items-center gap-2">
+            <span>{id} · {review?.submission_type}</span>
+            <StatusBadge status={review?.status} step={review?.current_step} />
+          </div>
         </div>
-        <button className="btn-primary" disabled={busy} onClick={() => run("full_review")}>
-          {busy ? "Working..." : "Run full review"}
-        </button>
+        <div className="flex items-center gap-3">
+          <label className="text-xs text-slate-500 flex items-center gap-1 select-none">
+            <input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} /> auto-refresh
+          </label>
+          <button className="btn-primary" disabled={busy} onClick={() => run("full_review")}>
+            {busy ? "Working..." : "Run full review"}
+          </button>
+        </div>
       </div>
 
       {/* Step nav */}
@@ -81,12 +115,12 @@ export default function ReviewWizard({ params }: { params: { id: string } }) {
 
       {msg && <div className="card text-xs text-slate-600">{msg}</div>}
 
-      <StepPanel id={id} step={step} review={review} run={run} busy={busy} onChange={refresh} setMsg={setMsg} />
+      <StepPanel id={id} step={step} review={review} run={run} busy={busy} onChange={refresh} setMsg={setMsg} tick={tick} />
     </div>
   );
 }
 
-function StepPanel({ id, step, review, run, busy, onChange, setMsg }: any) {
+function StepPanel({ id, step, review, run, busy, onChange, setMsg, tick }: any) {
   if (step === 0) {
     return (
       <div className="card">
@@ -103,9 +137,9 @@ function StepPanel({ id, step, review, run, busy, onChange, setMsg }: any) {
   if (step === 6) return <ReviewerProfilesStep />;
   if (step === 7) return <PromptsStep id={id} review={review} run={run} busy={busy} setMsg={setMsg} />;
   if (step === 8) return <ResponsesStep id={id} setMsg={setMsg} />;
-  if (step === 9) return <ReviewStep id={id} run={run} busy={busy} />;
+  if (step === 9) return <ReviewStep id={id} run={run} busy={busy} tick={tick} />;
   if (step === 10) return <ArtifactStep id={id} title="Integrity Audit" mode="integrity" run={run} busy={busy} relpath="reviewer_outputs/integrity_ai_use_audit.md" />;
-  if (step === 11) return <ResultsStep id={id} run={run} busy={busy} />;
+  if (step === 11) return <ResultsStep id={id} run={run} busy={busy} tick={tick} />;
   if (step === 12) return <ArtifactStep id={id} title="Revision Plan" mode="editorial_decision" run={run} busy={busy} relpath="editor/revision_plan.md" />;
   if (step === 13) return <ExportStep id={id} run={run} busy={busy} />;
   return null;
@@ -168,14 +202,14 @@ function decisionColor(d: string): string {
   return "bg-slate-50 text-slate-700 border-slate-200";
 }
 
-function ResultsStep({ id, run, busy }: any) {
+function ResultsStep({ id, run, busy, tick }: any) {
   const [sum, setSum] = useState<any>(null);
   const [editor, setEditor] = useState("");
   function load() {
     api.summary(id).then(setSum).catch(() => {});
     api.artifact(id, "editor/editor_decision.md").then((r) => setEditor(r.content)).catch(() => setEditor(""));
   }
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [id, tick]);
   const reviewers = sum?.reviewers || [];
   return (
     <div className="space-y-4">
@@ -389,12 +423,12 @@ function ResponsesStep({ id, setMsg }: any) {
   );
 }
 
-function ReviewStep({ id, run, busy }: any) {
+function ReviewStep({ id, run, busy, tick }: any) {
   const [tree, setTree] = useState<string[]>([]);
   const [sel, setSel] = useState("");
   const [content, setContent] = useState("");
   function loadTree() { api.tree(id).then((r) => setTree(r.files.filter((f: string) => f.startsWith("reviewer_outputs/")))).catch(() => {}); }
-  useEffect(() => { loadTree(); /* eslint-disable-next-line */ }, [id]);
+  useEffect(() => { loadTree(); /* eslint-disable-next-line */ }, [id, tick]);
   function open(f: string) { setSel(f); api.artifact(id, f).then((r) => setContent(r.content)); }
   return (
     <div className="card space-y-3">

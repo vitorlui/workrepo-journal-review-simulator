@@ -333,6 +333,7 @@ def run_pipeline(review_id: str, mode: str) -> PipelineResult:
 
     for step in sequence:
         result.steps.append(step)
+        _mark_running(review_id, step)
         if step in ("init", "ingest", "validate_upload"):
             _audit(review_id, f"{step}: no-op (handled at upload time)")
         elif step == "extract":
@@ -402,6 +403,27 @@ def _extract_decision(review_id: str) -> str | None:
         if d in first:
             return d
     return None
+
+
+_STEP_NUM = {
+    "extract": 2, "classify": 3, "scan_venues": 4, "discover_venues": 4, "venue_fit": 4,
+    "timeline": 4, "desk_reject_precheck": 5, "generate_external_prompts": 7,
+    "review": 9, "specialized_review": 9, "integrity": 10, "editorial_decision": 11,
+    "export": 13,
+}
+
+
+def _mark_running(review_id: str, step: str) -> None:
+    """Lightweight per-step progress so the UI can show live status."""
+    try:
+        meta = _load_meta(review_id)
+        meta["status"] = f"running:{step}"
+        sn = _STEP_NUM.get(step)
+        if sn is not None:
+            meta["current_step"] = max(int(meta.get("current_step", 0) or 0), sn)
+        _save_meta(review_id, meta)
+    except Exception:
+        pass
 
 
 def _update_meta_status(review_id: str, mode: str) -> None:

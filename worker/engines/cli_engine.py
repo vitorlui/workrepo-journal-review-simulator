@@ -17,6 +17,15 @@ from typing import Optional
 
 from worker.engines.base import EngineResult, ReviewEngine
 
+try:  # optional safety net for mojibake / mixed encodings
+    import ftfy
+
+    def _fix_text(s: str) -> str:
+        return ftfy.fix_text(s or "")
+except Exception:  # pragma: no cover
+    def _fix_text(s: str) -> str:
+        return s or ""
+
 
 class CliEngine(ReviewEngine):
     def __init__(self, name: str, spec: dict):
@@ -57,11 +66,14 @@ class CliEngine(ReviewEngine):
         full_prompt = prompt if not system else f"{system}\n\n{prompt}"
         tmp_path: Optional[str] = None
         try:
+            # Decode CLI output as UTF-8 explicitly. On Windows text=True would
+            # otherwise use the locale codepage (cp1252) and mangle UTF-8 output
+            # (em dashes etc. become "â€"").
+            run_kw = dict(capture_output=True, text=True, encoding="utf-8",
+                          errors="replace", timeout=self._timeout)
             if self._pass_via == "arg":
                 argv = argv + [full_prompt]
-                proc = subprocess.run(
-                    argv, capture_output=True, text=True, timeout=self._timeout
-                )
+                proc = subprocess.run(argv, **run_kw)
             else:
                 # Feed the prompt from a real temp file as stdin. A piped `input=`
                 # races some CLIs (e.g. `claude -p` aborts after a 3s stdin wait);
@@ -72,9 +84,7 @@ class CliEngine(ReviewEngine):
                     tf.write(full_prompt)
                     tmp_path = tf.name
                 with open(tmp_path, "r", encoding="utf-8") as fin:
-                    proc = subprocess.run(
-                        argv, stdin=fin, capture_output=True, text=True, timeout=self._timeout
-                    )
+                    proc = subprocess.run(argv, stdin=fin, **run_kw)
         except subprocess.TimeoutExpired:
             return EngineResult(False, "", self.name, self.model(), error="CLI timed out")
         except Exception as exc:  # noqa: BLE001
@@ -87,6 +97,6 @@ class CliEngine(ReviewEngine):
                     pass
 
         if proc.returncode != 0:
-            return EngineResult(False, proc.stdout or "", self.name, self.model(),
+            return EngineResult(False, _fix_text(proc.stdout or ""), self.name, self.model(),
                                 error=(proc.stderr or f"exit {proc.returncode}").strip()[:500])
-        return EngineResult(True, (proc.stdout or "").strip(), self.name, self.model())
+        return EngineResult(True, _fix_text((proc.stdout or "").strip()), self.name, self.model())
