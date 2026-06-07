@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "Bash(git --version)",
+      "PowerShell($gh = Get-Command gh -ErrorAction SilentlyContinue; if \\($gh\\) { \"gh found at: $\\($gh.Source\\)\"; gh --version } else { \"gh NOT found\" })"
+    ]
+  }
+}
