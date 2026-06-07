@@ -379,17 +379,27 @@ def run_pipeline(review_id: str, mode: str) -> PipelineResult:
 
 
 def _extract_decision(review_id: str) -> str | None:
-    """Best-effort parse of the editor's final decision from editor_decision.md."""
+    """Parse the editor's final decision = the first line after the Decision header.
+
+    Only the decision line is inspected (not the rationale), so phrases like
+    "major revision rather than desk reject" don't mis-resolve to desk reject.
+    """
     p = review_dir(review_id) / "editor" / "editor_decision.md"
     if not p.exists():
         return None
-    text = read_text(p).lower()
-    m = re.search(r"##\s*decision(.{0,500})", text, re.S)
-    seg = m.group(1) if m else ""
-    if not seg or "needs_user_input" in seg[:120]:
+    text = read_text(p)
+    m = re.search(r"(?im)^#+\s*decision\s*:?\s*$", text)
+    after = text[m.end():] if m else ""
+    first = ""
+    for ln in after.splitlines():
+        s = ln.strip().strip("*>#`").strip()
+        if s:
+            first = s.lower()
+            break
+    if not first or "needs_user_input" in first:
         return None  # template scaffold — no real decision yet
     for d in ("desk reject", "major revision", "minor revision", "accept", "reject"):
-        if d in seg:
+        if d in first:
             return d
     return None
 
