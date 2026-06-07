@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, uploadFile, API_BASE } from "@/lib/api";
 import Markdown from "@/components/Markdown";
 
@@ -276,12 +276,18 @@ function VenuesStep({ id, review, run, busy, setMsg, tick }: any) {
   const [data, setData] = useState<any>({ candidates: [], detected_area_labels: [] });
   const [selected, setSelected] = useState<string[]>([]);
   const [showAll, setShowAll] = useState(false);
+  const initRef = useRef(false);
   function load() { api.venueCandidates(id).then(setData).catch((e) => setMsg(String(e))); }
+  // Candidates may refresh on the auto-refresh tick.
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [id, tick]);
+  // Initialise the selection from saved metadata ONCE, so auto-refresh never
+  // wipes the checkboxes the user is editing before they hit Save.
   useEffect(() => {
-    load();
-    setSelected(review?.metadata?.selected_venues || []);
-    // eslint-disable-next-line
-  }, [id, tick]);
+    if (!initRef.current && review?.metadata) {
+      setSelected(review.metadata.selected_venues || []);
+      initRef.current = true;
+    }
+  }, [review]);
 
   function toggle(vid: string) {
     setSelected((s) => s.includes(vid) ? s.filter((x) => x !== vid) : [...s, vid]);
