@@ -39,9 +39,9 @@ def test_full_review_pipeline_produces_outputs():
     ):
         assert (root / rel).exists(), f"missing {rel}"
 
-    # Main reviewers ran for the auto-selected venue.
+    # Default main reviewers (3 core ones) ran for the auto-selected venue.
     internal = list((root / "reviewer_outputs" / "internal").glob("*.md"))
-    assert len(internal) >= 5
+    assert len(internal) >= 3
 
     # Editor decision carries the mandatory metadata + no mechanical average note.
     decision = (root / "editor" / "editor_decision.md").read_text(encoding="utf-8")

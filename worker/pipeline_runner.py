@@ -124,8 +124,9 @@ def _enabled_specialized(meta: dict) -> list[str]:
 
 
 def _main_reviewers() -> list[str]:
+    """Default main reviewers = those marked default_enabled (the 3 core ones)."""
     cfg = load_config("reviewer_profiles")
-    return [p["id"] for p in cfg.get("main_reviewers", [])]
+    return [p["id"] for p in cfg.get("main_reviewers", []) if p.get("default_enabled", True)]
 
 
 # --------------------------------------------------------------------------- #

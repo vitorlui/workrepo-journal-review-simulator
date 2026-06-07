@@ -17,7 +17,7 @@ main_reviewers:
     title: "Reviewer 3 — Systems, architecture & implementation"
     profile_md: data/global_knowledge/reviewer_profiles/reviewer-systems-architecture.md
     agent: .claude/agents/reviewer-systems-architecture.md
-    default_enabled: true
+    default_enabled: false   # optional: enable in Step 6 when relevant
   - id: reviewer-reproducibility
     title: "Reviewer 4 — Reproducibility & empirical robustness"
     profile_md: data/global_knowledge/reviewer_profiles/reviewer-reproducibility.md
@@ -27,7 +27,7 @@ main_reviewers:
     title: "Reviewer 5 — Scientific impact & editorial strategy"
     profile_md: data/global_knowledge/reviewer_profiles/reviewer-scientific-impact.md
     agent: .claude/agents/reviewer-scientific-impact.md
-    default_enabled: true
+    default_enabled: false   # optional: enable in Step 6 when relevant
 
 specialized_reviewers:
   - id: reviewer-document-ai-htr
