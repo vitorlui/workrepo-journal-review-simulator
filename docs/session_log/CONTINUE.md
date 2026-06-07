@@ -1,48 +1,68 @@
 # How to continue the session
 
+_Standby 2026-06-07, resuming ~2026-06-09. master == origin/master @ `b03afad`._
+
 ## 30-second recap
-We built a working MVP of `journal-review-simulator` (Next.js + FastAPI + `worker/` core +
-Postgres/SQLite). 37 venues imported from the bundled Perplexity files. Offline `template`
-pipeline runs end to end. Added **CLI engine integration**: the "Execute query" button runs
-`claude`/`codex`/`gemini`/`ollama` with our generated prompt and saves the response. 32 pytest
-pass; Docker images build. Work is on branch `feat/mvp-scaffold`.
+Working MVP + heavy UI/UX hardening + a proven real-engine run. Hybrid system: deterministic parts are
+real (extraction, classification, venue ranking, desk-reject); reviewers/integrity/editor are template
+scaffolds by default but really run the agent CLI when `PIPELINE_ENGINE` is set (proven on PAPER_A with
+claude). Read `STATE.md` first.
 
-## First things to do when resuming
-1. `git status` and read `docs/session_log/STATE.md` (current state) + `bitacora.md` (history).
-2. If not merged yet: `git checkout master && git merge --ff-only feat/mvp-scaffold`.
-3. Sanity: `cd <repo>; $env:PYTHONPATH="."; python -m pytest tests/ -q` → expect 32 passed.
-4. To try the engine CLIs live: `python scripts\run_query.py --status` (codex/gemini need a
-   one-time login: run `codex` / `gemini` once and sign in).
+## Restart the servers (native — needed for engine CLIs)
+`:3000` is OpenWebUI, so the web runs on **:3001**.
 
-## Candidate next steps (not yet done)
-- ~~Wire engines into the internal pipeline~~ **DONE** (2026-06-07): `agent_orchestrator` runs the
-  real CLI for reviewers/integrity/editor when `PIPELINE_ENGINE` is set, with offline fallback.
-  Next polish: per-call model-comparison output, or per-venue parallelism.
-- **End-to-end real-engine run:** set `PIPELINE_ENGINE=codex` (or claude/gemini, logged in),
-  `python scripts/run_pipeline.py --review-id <id> --mode full_review`, and review the generated
-  Markdown for quality. (Slow: ~10 CLI calls.)
-- **Run the Playwright E2E** now that Node is installed: `cd apps/web; npm install;
-  npm run test:e2e:install; npm run test:e2e` (stack must be up).
-- **"Review my pending papers"** flow: the user offered to provide real papers; ingest them
-  into reviews and generate real reviews (Claude/Codex) directly.
-- **Per-prompt Execute-query buttons** (currently one combined control in step 7) + a
-  "run all reviewers for engine X" batch action.
-- **Import the full Perplexity venue batch** when ready: drop into
-  `data/global_knowledge/venue_discovery/raw/` and `python scripts/import_venue_discovery.py`.
-- **Pending-requests loop** + **recent-papers upload UI** (currently stubs).
-- Optional: provision the CLIs inside a worker image, or add an async queue.
+```powershell
+# 1) API (template engine, SQLite, no Docker needed)
+cd C:\Users\Usuari\Desktop\journal-review-simulator
+$env:PYTHONPATH = "."
+python -m uvicorn app.main:app --app-dir apps\api --host 127.0.0.1 --port 8000
+#   -> for REAL agents in the browser instead, prefix:  $env:PIPELINE_ENGINE="claude"  (or codex)
 
-## Ready-to-paste kickoff prompt for the next session
-> Continue the `journal-review-simulator` project. Read `docs/session_log/STATE.md`,
-> `bitacora.md`, and `DECISIONS.md` first to recover context. We are on branch
-> `feat/mvp-scaffold` (merge to master if not done). Then [pick a next step from
-> `CONTINUE.md`, e.g. "wire the engine CLIs into the internal reviewer pipeline with offline
-> fallback and add a test"]. Keep the approved A/B/C deviations and the CLI-over-API stance.
+# 2) Web (new terminal)
+cd C:\Users\Usuari\Desktop\journal-review-simulator\apps\web
+$env:NEXT_PUBLIC_API_URL = "http://localhost:8000"
+npx next dev -p 3001
+#   open http://localhost:3001
+```
+If port 8000 is stuck from an old run: `Get-NetTCPConnection -LocalPort 8000 | %{ Stop-Process -Id $_.OwningProcess -Force }`.
+
+Sanity: `$env:PYTHONPATH="."; python -m pytest tests/ -q` → 36 passed.
+
+## First things on resume
+1. `git status` (should be clean) + read `STATE.md` + this file.
+2. Restart the two servers (above). Open `colapri` / PAPER_A in Edge to see the latest UI.
+3. Decide the engine question below.
+
+## The open question (where we paused)
+The user asked: *"is it mocked or do we run real agents?"* — answer: hybrid (see STATE.md). The pending
+decision: **do they want the web API to run with a real engine** so browser "Run" buttons produce real
+agent content?
+- **`codex` (ChatGPT Pro):** run `codex` once to log in, then start the API with `$env:PIPELINE_ENGINE="codex"`.
+  Separate process → more reliable than nested claude. Recommended for real web runs.
+- **`claude`:** works but nested-in-Claude-Code is flaky/slow (first call can hang ~5 min).
+- **`ollama`:** install + `ollama pull llama3.1` for free local runs.
+Caveat: a real full_review is ~9 CLI calls (minutes) and blocks the synchronous request; template stays instant.
+
+## Candidate next steps
+- **Wire desk-reject style real heuristics** to more steps, or make the precheck optionally engine-backed.
+- **Async task queue** (arq/RQ) so real-engine runs don't block the web request (currently synchronous).
+- **Per-step "Run" with real engine from the web** once an engine is wired into the API.
+- Review PAPER_B/PAPER_C against their correct venues (Scientific Data / agri venues) with a real engine.
+- Optional: merge the near-duplicate `dib`/`dib-2` venues; improve the venue Markdown-table importer to
+  flag cell-count mismatches (the 6 repaired venues were a symptom).
+- Clean up extra test/demo reviews under `data/reviews/` if desired (all gitignored).
 
 ## Gotchas / reminders
-- Windows shell: don't `pip install weasyprint` natively (GTK pain) — it's Docker-only.
-- The Bash tool's working directory persists between calls; `cd` to the repo root explicitly.
-- Engine CLIs only work when the backend runs **natively** (not in Docker).
-- `data/reviews/`, `data/uploads/`, `*.db` are gitignored; `data/global_knowledge/**` is versioned.
-- Don't re-run the importer against already-imported venues without clearing
-  `venues/journals/` first, or you get `-2` suffixed duplicates.
+- Web on **:3001** (3000 = OpenWebUI). API on :8000. CORS allows any localhost port now.
+- Don't `pip install weasyprint` natively on Windows (Docker-only).
+- Bash tool working dir persists; `cd` to the repo root explicitly.
+- `data/reviews/`, `data/uploads/`, `*.db`, and `apps/web/e2e/papers/*` (your PDFs) are gitignored.
+- Frequent API restarts cause a brief "Failed to fetch" in the web — now silenced in the poll.
+- Charset: the product is UTF-8 clean; `curl | python` on Windows mis-renders accents in diagnostics only.
+
+## Ready-to-paste kickoff prompt
+> Continue the `journal-review-simulator`. Read docs/session_log/STATE.md, bitacora.md and CONTINUE.md to
+> recover context (we are on master @ the latest commit; servers are stopped — restart per CONTINUE.md).
+> Then [pick: e.g. "start the web API with PIPELINE_ENGINE=codex (after I log in to codex) so the browser
+> Run buttons produce real agent reviews", or "add an async queue so real-engine runs don't block"].
+> Keep the approved deviations (DECISIONS.md) and the hybrid template/real-engine design.

@@ -131,9 +131,53 @@ default) → **36 pytest pass**. Updated STATE.md + CONTINUE.md.
   2 real claude reviews as-is for now.
 - 36 pytest pass throughout.
 
+## 14. Live real-engine review + UI/UX hardening (same day, long session)
+All pushed to `origin/master` (latest commit `b03afad`). Highlights:
+
+- **Default reviewers:** 3 core (methodology, domain, reproducibility) → then **4** after the user asked
+  to include systems-architecture. `_main_reviewers()` honours `default_enabled`. Specialized still
+  auto-activate by area; scientific-impact is optional. (commits `62a90da`, `c8346c9`)
+- **Completed status:** pipeline now writes `status`/`current_step` (+ parsed final decision) to
+  `metadata.yaml`, so the UI shows reviews as completed (was always "created"). (`39c63ba`)
+- **Results view (step 11):** `GET /reviews/{id}/summary` + `worker/summary.py` digest each reviewer's
+  recommendation + the editor decision; the wizard shows a colored decision banner + a reviewer table +
+  rendered Markdown (`react-markdown` + `remark-gfm`, `components/Markdown.tsx`). (`002c96d`)
+- **Double-confirm** before regenerating a completed review. (`b070993`)
+- **REAL engine demo (the big one):** installed Node + `@openai/codex` + `@google/gemini-cli`. Ran
+  `PIPELINE_ENGINE=claude full_review` on PAPER_A (the wheat/DON NIR-HSI paper). Found+fixed: PDF field
+  extraction (title/abstract fallback), `claude -p` stdin race (temp-file stdin), editor decision
+  parsing. **Demonstrated end-to-end**: against **JMLR** → editor **DESK REJECT** (scope mismatch, redirect);
+  re-ran against the correct venue **Scientific Data** → 7 real claude reviewers (all *major revision*) →
+  editor **MAJOR REVISION**. Proves venue choice drives the decision and that agents really run.
+  (`62c7a17`, `e01ec64`)
+- **Playwright E2E with the user's papers:** copied PAPER_A/B/C from Downloads into `apps/web/e2e/papers/`,
+  ran headed + slow on **Edge** (`PW_CHANNEL=msedge`, Chromium download was AV-blocked) → 3 passed.
+- **Charset fix:** `cli_engine` decoded CLI output as cp1252 on Windows → mojibake (`â€"`). Fixed: decode
+  UTF-8 explicitly + `ftfy` safety net + repaired existing files. (`d83467e`)
+- **Live status:** running panel (spinner + elapsed + ETA + progress bar) + browser notification on
+  finish + per-step `running:*` status; auto-refresh poll (4s) bumps a tick so panels self-update,
+  even for CLI-triggered runs. (`c3fde89`)
+- **Area over-detection fix:** keyword matching was substring-based (`cer`∈`cereal`, `don`∈`done`) →
+  whole-token matching + ≥2-keyword threshold + cap 3 areas. (`192817d`)
+- **Venue discovery UI:** ranked candidates (relevant first, green score badge, dim non-matches,
+  show-all toggle) via `GET /reviews/{id}/venue-candidates`; **repaired 6 venues** whose `venue_family`
+  was mangled by inconsistent Markdown-table cells (c-e, cea, cviu, eait, tlt, toce). (`7676910`)
+- **Next-step button + dimmed pending steps** (done detected by artifact existence, `isStepDone`). (`7676910`, `be8556e`)
+- **Save-selection fix** (auto-refresh was wiping checkboxes). (`b920dc1`)
+- **Artifact panel hardening** (never blanks on error, self-heals, empty-state hint; silent poll errors). (`4320b74`)
+- **NEEDS_USER_INPUT → "pending"** in the UI (data keeps the token); strip literal `**`. (`c3fde89`)
+- **Auto-identified metadata:** title is taken from the extracted manuscript (classify step). Step 0 is a
+  clean read-only summary (the review is created on "New Review"; Upload is the real first action). (`c3fde89`)
+- **Desk-reject precheck made real:** deterministic findings from the extraction (missing references,
+  no experiments, no data/code statement, no area) + verdict — no longer a blank NEEDS_USER_INPUT scaffold. (`b03afad`)
+- **Honest architecture note (user asked):** deterministic parts are REAL (extraction, classification,
+  venue ranking, desk-reject). Reviewers/integrity/editor are **template scaffolds by default** but
+  **really run the agent CLI** when `PIPELINE_ENGINE` is a real engine (proven on PAPER_A). The **web API
+  runs `template` by default** → browser "Run" buttons give scaffolds unless the API is started with
+  `PIPELINE_ENGINE=claude|codex`.
+
 ---
 
-### Pending after this entry
-- Push the latest commits (`62c7a17` etc.) to origin.
-- When desired: `codex` login → `PIPELINE_ENGINE=codex` full_review for a reliable real run.
-- Consider lowering the claude CLI timeout / a warm-up call if revisiting nested claude.
+### Standby — 2026-06-07 (resuming ~2026-06-09)
+Working tree clean, `master` == `origin/master` @ `b03afad`. See `STATE.md` for the snapshot and
+`CONTINUE.md` for exactly how to restart the servers and what to do next.

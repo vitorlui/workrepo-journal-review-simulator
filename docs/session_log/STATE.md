@@ -1,88 +1,57 @@
 # Current state snapshot
 
-_As of 2026-06-07. Update at end of each session._
+_As of 2026-06-07 (standby; resuming ~2026-06-09). master == origin/master @ `b03afad`._
 
 ## TL;DR
-A working MVP of the pre-submission editorial review simulator: Next.js UI + FastAPI +
-shared `worker/` core + Postgres/SQLite index. **37 venues imported.** Offline `template`
-pipeline runs end to end. **CLI engine integration** lets a worker run `claude`/`codex`/
-`gemini`/`ollama` with the generated prompt ("Execute query" button). 32 pytest pass;
-Docker images build.
+Working MVP + a lot of UI/UX hardening and a proven real-engine run. The product is a **hybrid**:
+deterministic parts are real; the reviewer/integrity/editor agents are template scaffolds by default
+but really execute the engine CLI when configured. 36 pytest pass. Everything committed + pushed.
+
+## What is REAL vs TEMPLATE (important — the user asked)
+- **REAL / deterministic:** manuscript extraction (pypdf/python-docx/LaTeX), area classification
+  (whole-token keyword match), venue discovery + ranking (family overlap), **desk-reject precheck**
+  (heuristics from the extraction), safe upload (hash/MIME/ZIP sandbox), venue import.
+- **TEMPLATE by default, REAL with an engine:** the 4 main reviewers + specialized + integrity audit +
+  editor. With `PIPELINE_ENGINE=template` (default) → Markdown scaffolds showing "pending". With
+  `PIPELINE_ENGINE=claude|codex|ollama|gemini` → they really run the CLI agent (proven: PAPER_A reviewed
+  by real claude → MAJOR REVISION vs DESK REJECT by venue).
+- **The web API runs `template` by default**, so browser "Run" buttons produce scaffolds. To get real
+  agents in the browser, start the API with `PIPELINE_ENGINE` set (see CONTINUE.md).
 
 ## Environment
-- OS: Windows 11. Shell: PowerShell (+ bash available).
-- Python: **3.13** (Windows Store). Key deps installed: sqlalchemy, pyyaml, fastapi,
-  python-multipart, httpx, pytest. (Native run also needs uvicorn/pypdf/python-docx/filetype —
-  `dev_native.ps1` installs them. **weasyprint is Docker-only**; do NOT `pip install` it on Windows.)
-- Node: **v24.16.0** (installed via winget this session). npm v11.
-- CLIs installed on host: **codex**, **gemini** at `%APPDATA%\npm\` (need one-time login).
-  `claude` available via Claude Code. `ollama` not installed.
-- Docker Desktop: running; images built (web 1.01 GB, api/worker 459 MB).
+- Windows 11. Python 3.13. Node **v24** (winget). CLIs installed: `claude` (Claude Code), `codex`
+  (`%APPDATA%\npm`, needs `codex` login once), `gemini` (needs Google login once). `ollama` not installed.
+- Extra Python deps installed this session: `ftfy`, `pytest`, `fastapi`, `httpx`, plus the API runtime deps.
+- **Ports:** `:3000` is the user's **OpenWebUI** — our **web runs on :3001**, API on **:8000**.
+- Docker images built earlier (web/api/worker). Native run is what's used for engine CLIs.
 
-## Architecture (see README §2 + DECISIONS.md)
-- **`worker/` = single core library** (C6): imported by `apps/api` and `scripts/`.
-- **API** = thin FastAPI over `worker/`; runs pipeline **in-process** (no queue) for MVP.
-- **DB** = index/workflow-state only; ORM models canonical, `db/schema.sql` generated (C9).
-  Postgres in Docker, **SQLite fallback** locally (`data/jrs_local.db`, gitignored).
-- **Markdown/YAML under `data/` is the semantic memory** (bind-mounted in Docker).
+## Servers (were running this session; restart on resume — see CONTINUE.md)
+- API (uvicorn) on `127.0.0.1:8000`, engine = `template`.
+- Web (`next dev -p 3001`) on `localhost:3001`, `NEXT_PUBLIC_API_URL=http://localhost:8000`.
 
-## File map (key)
-```
-worker/         review_id, file_ingestion, extraction, classify, markdown_store,
-                external_prompt_manager, agent_orchestrator, pipeline_runner, exporters,
-                venues, venue_discovery, reviews, external_responses, db, paths, run_query,
-                engines/ (base, cli_engine, ollama_engine, openai_engine, __init__)
-apps/api/app/   main.py, core.py, routers/{reviews,pipeline,venues,venue_discovery,
-                responses,catalog,export}.py
-apps/web/       app/ (layout + page + reviews/[id] wizard + venues + reviewer-profiles +
-                ai-engines + papers + ... ), components/Sidebar, lib/api.ts, e2e/ (Playwright)
-config/         pipeline, scoring_rubrics, model_config (+cli_engines), reviewer_profiles,
-                venue_discovery, external_engines, upload_policy .yaml
-db/             schema.sql (generated), seed/*.sql
-scripts/        run_pipeline, init_review, parse_paper, discover_venues, scan_venue_markdowns,
-                import_venue_discovery, build_literature_matrix, compare_models, build_report,
-                export_review_package, check_structure, dump_schema, run_query, dev_native.ps1
-data/global_knowledge/  venues/journals/<37 venues>, venue_discovery/{raw,processed,import_reports},
-                reviewer_profiles/<13>, venues/template, recent_papers, ...
-.claude/        agents/<18>, skills/review-paper-reviewer/SKILL.md
-tests/          conftest, test_worker_core, test_venue_discovery, test_pipeline, test_api, test_engines
-```
+## Reviews on disk (data/reviews/, gitignored)
+- **PAPER_A** `REV-20260607-170748-B984L5` (wheat/DON NIR-HSI) — full real-claude review vs **Scientific
+  Data** → **MAJOR REVISION** (6/7 reviewers real). Cleaned areas: agri-food, ML/CV, dataset.
+- **PAPER_B** `REV-...-7FL9FX`, **PAPER_C** `REV-...-5GUZDT` — completed with template engine.
+- **colapri** `REV-20260607-190503-3GJFH2` — a **cloud** paper, full template review; desk-reject now
+  shows 4 real gap flags.
+- (A couple of E2E/test reviews may also exist; all gitignored.)
 
-## Verified working
-- `python scripts/check_structure.py` → 57/57.
-- Venue importer on both bundled files → 37 venues, processed CSV/JSON + import report,
-  unverified values preserved, UTF-8 correct.
-- Full pipeline (`--mode full_review`) → extraction, classification (FAS/HTR/cloud detected on
-  the sample), candidate venues, external prompts, 5 main + specialized reviewers, integrity
-  audit, editor decision package, export zip, audit log.
-- FastAPI via TestClient (health, dashboard, venues=37, reviewer-profiles 5/6/2, pipeline,
-  engine-status, run-query route).
-- CLI engine: `claude -p` executed live from the worker; unavailable CLIs degrade gracefully.
-- **`pytest tests/` → 32 passed.**
+## Key files added/changed this session
+- Backend: `worker/summary.py` (results digest), `worker/engines/cli_engine.py` (UTF-8 + ftfy + temp-file
+  stdin), `worker/classify.py` (whole-token), `worker/venues.py` (ranking + real desk-reject),
+  `worker/pipeline_runner.py` (per-step status, completed status, decision parse, title auto-id),
+  `apps/api/app/routers/reviews.py` (`/summary`, `/venue-candidates`).
+- Frontend: `apps/web/app/reviews/[id]/page.tsx` (running panel, ETA, notifications, auto-refresh tick,
+  dimmed steps + Next button, Results view, venue ranking, pending placeholders, robust artifact panel),
+  `components/Markdown.tsx`, `components/HelpButton.tsx` (guided tour).
+- E2E: `apps/web/e2e/{smoke,review-flow,help,paper-runs}.spec.ts`, `papers/` (PAPER_A/B/C, gitignored).
 
-## Git
-- Branch **`feat/mvp-scaffold`**. Commits: `32342f4` (initial, pre-session) →
-  `a7ab4d9` (MVP) → `fde22d3` (CLI integration + E2E) → (pending: launcher/docs/logbook).
-- `master` still at `32342f4` — **merge pending** (recommended).
-- No git remote configured (local only).
+## Tests
+`$env:PYTHONPATH="."; python -m pytest tests/ -q` → **36 passed**.
 
-## How to run
-- **Full stack (Docker):** `docker compose up --build` → web :3000, api :8000.
-- **Native (to use host CLIs):** `powershell -ExecutionPolicy Bypass -File scripts\dev_native.ps1`
-  (API :8000, SQLite) + `cd apps\web; npm install; npm run dev` (web :3000).
-- **Import venues:** `python scripts/import_venue_discovery.py`.
-- **Run a CLI query w/o frontend:** `python scripts/run_query.py --status` then
-  `--review-id <id> --venue <vid> --reviewer reviewer-methodology --engine codex`.
-
-## Known limitations / not done (by design for MVP)
-- Internal reviewers/editor/integrity default to the **offline template** scaffold. Set
-  `PIPELINE_ENGINE=claude|codex|gemini|ollama` to run that CLI for the **whole internal pipeline**
-  (reviewers + integrity + editor), with automatic offline fallback if the CLI is missing/errors.
-  Wired in `worker/agent_orchestrator.py` (real-engine path + prompt builders). The Execute-query
-  button remains for per-prompt, on-demand runs.
-- No async task queue (in-process). Note: with a real engine, a full review spawns ~10 CLI calls
-  sequentially (slow but expected); `template` stays instant.
-- PDF export best-effort (weasyprint only in Docker image).
-- Perplexity engine intentionally omitted.
-- Recent-papers upload UI and pending-request auto-loop are stubs.
-- Playwright specs written but not executed here (Node was just installed; run them now).
+## Known limitations / next (see CONTINUE.md)
+- Web API on template → browser runs are scaffolds unless engine set.
+- Nested `claude -p` inside Claude Code is flaky/slow (first call can hang to timeout). `codex`/`ollama`
+  (separate processes) are more reliable for real runs.
+- An orphan uvicorn from a `&`-launched restart may linger; kill by port 8000 on resume if needed.
