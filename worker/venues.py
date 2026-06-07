@@ -153,21 +153,64 @@ def write_timeline_report(review_id: str, venue_ids: list[str]) -> Path:
 
 
 def write_desk_reject_precheck(review_id: str) -> Path:
-    checks = [
-        "Is the paper clearly out of scope?",
-        "Is there a clear contribution?",
-        "Is there minimal experimental evaluation?",
-        "Is the format far from the venue's requirements?",
-        "Are references incomplete?",
-        "Are there claims without evidence?",
-        "Does the venue require data/code the paper does not declare?",
-        "Are there obvious ethical problems?",
-        "Does the paper seem not ready for review?",
-    ]
-    rows = "\n".join(f"| {c} | NEEDS_USER_INPUT |" for c in checks)
+    """Deterministic desk-reject screening from the extracted fields (no engine).
+
+    Flags real gaps (missing references, no experiments, no data/code statement…)
+    so the precheck is actionable instead of a blank scaffold.
+    """
+    extraction = read_yaml(review_dir(review_id) / "extracted" / "paper_extraction.json")
+    fields = extraction.get("fields", {}) if extraction else {}
+    meta = read_yaml(review_dir(review_id) / "metadata.yaml")
+    areas = meta.get("detected_area_labels") or meta.get("detected_areas") or []
+
+    def present(key: str) -> bool:
+        v = str(fields.get(key, "") or "").strip()
+        return bool(v) and v not in ("NEEDS_USER_INPUT", "UNKNOWN", "MISSING")
+
+    flags = 0
+    checks: list[tuple[str, str]] = []
+
+    if areas:
+        checks.append(("Is the paper clearly out of scope?", f"Low risk — detected areas: {', '.join(areas)}"))
+    else:
+        flags += 1
+        checks.append(("Is the paper clearly out of scope?", "⚠ No research area detected — possible scope/extraction issue"))
+
+    ok = present("claimed_contributions")
+    flags += 0 if ok else 1
+    checks.append(("Is there a clear contribution?", "Contributions extracted" if ok else "⚠ Contributions not clearly extracted — verify"))
+
+    ok = present("experiments") or present("results_summary")
+    flags += 0 if ok else 1
+    checks.append(("Is there minimal experimental evaluation?", "Experiments/results present" if ok else "⚠ No experiments/results extracted"))
+
+    checks.append(("Is the format far from the venue's requirements?", "Not assessed — upload the venue format template (step 4)"))
+
+    ok = present("references")
+    flags += 0 if ok else 1
+    checks.append(("Are references incomplete?", "References detected" if ok else "⚠ References not detected in the extraction"))
+
+    checks.append(("Are there claims without evidence?", "Needs reviewer judgement — run Autonomous Review (step 9)"))
+
+    ok = present("reproducibility_artifacts")
+    flags += 0 if ok else 1
+    checks.append(("Does the venue require data/code the paper does not declare?",
+                   "Reproducibility artifacts declared" if ok else "⚠ No data/code availability statement detected"))
+
+    ok = present("ethical_considerations")
+    checks.append(("Are there obvious ethical problems?",
+                   "Ethics statement present" if ok else "Not detected — verify if human/minors data is involved"))
+
+    verdict = (f"⚠ {flags} potential gap(s) flagged above — address before submission"
+               if flags >= 2 else "No blocking gaps from the extraction — looks ready for review")
+    checks.append(("Does the paper seem not ready for review?", verdict))
+
+    rows = "\n".join(f"| {c} | {f} |" for c, f in checks)
     body = (
         f"# Desk-reject precheck — {review_id}\n\n"
-        f"_Generated {now_iso()} — this is a warning, it does not stop the pipeline._\n\n"
+        f"_Generated {now_iso()} — deterministic screening from the manuscript extraction; "
+        "a warning only, it does not stop the pipeline._\n\n"
+        f"**Summary:** {verdict}\n\n"
         "| Check | Finding |\n| --- | --- |\n" + rows + "\n"
     )
     path = review_dir(review_id) / "venues" / "desk_reject_precheck.md"
