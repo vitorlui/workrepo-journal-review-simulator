@@ -111,8 +111,29 @@ default) → **36 pytest pass**. Updated STATE.md + CONTINUE.md.
 - 36 pytest still pass. The 3 demo reviews remain under `data/reviews/` (gitignored) — ready to run
   the full reviewer/editor pipeline on, optionally with a real engine.
 
+## 13. Real-engine run on PAPER_A (claude) + bug fixes
+**Done:**
+- Ran `full_review` with `PIPELINE_ENGINE=claude` on PAPER_A. The **integrity audit and editor
+  ran real (claude-sonnet-4-6)** and produced excellent, rule-respecting content (the editor even
+  refused to invent findings and flagged a venue mismatch — JMLR auto-selected for a wheat/DON paper).
+- **Two real bugs found & fixed** (commit `62c7a17`):
+  1. **PDF field extraction**: raw text extracted fine (16 KB) but structured fields were all
+     `NEEDS_USER_INPUT` because the parser only read Markdown `#` headings. Added a fallback:
+     title = first line, abstract = text after the "Abstract" keyword. PAPER_A now extracts a real
+     title/abstract.
+  2. **`claude -p` stdin race**: piped `input=` made `claude -p` abort after a 3s stdin wait →
+     reviewers fell back to template. Fixed by feeding a **temp-file stdin handle**. Verified live.
+- **Known limitation (important):** running `claude -p` **nested inside this Claude Code session**
+  is flaky — the *first* call tends to hang to the 600s timeout, and a long 10-call run **died at
+  3/8** (process vanished, no traceback). 2 reviewers came out real (domain, systems).
+  **Recommendation:** for full real runs use a **separate-process engine — `codex` (ChatGPT Pro,
+  needs one-time `codex` login) or `ollama` (local)** — not nested claude. User chose to keep the
+  2 real claude reviews as-is for now.
+- 36 pytest pass throughout.
+
 ---
 
 ### Pending after this entry
-- Commit entry-12 fixes (CORS regex, E2E assertions, `PW_CHANNEL`, this bitácora) + push.
-- Run a **full_review** (and a real-engine run) on the 3 ingested papers; see `CONTINUE.md`.
+- Push the latest commits (`62c7a17` etc.) to origin.
+- When desired: `codex` login → `PIPELINE_ENGINE=codex` full_review for a reliable real run.
+- Consider lowering the claude CLI timeout / a warm-up call if revisiting nested claude.
