@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { api, uploadFile, API_BASE } from "@/lib/api";
+import Markdown from "@/components/Markdown";
 
 const STEPS = [
   "0. Create / Metadata", "1. Upload", "2. Extraction", "3. Area & Paper Type",
@@ -89,7 +90,7 @@ function StepPanel({ id, step, review, run, busy, onChange, setMsg }: any) {
   if (step === 8) return <ResponsesStep id={id} setMsg={setMsg} />;
   if (step === 9) return <ReviewStep id={id} run={run} busy={busy} />;
   if (step === 10) return <ArtifactStep id={id} title="Integrity Audit" mode="integrity" run={run} busy={busy} relpath="reviewer_outputs/integrity_ai_use_audit.md" />;
-  if (step === 11) return <ArtifactStep id={id} title="Editor Decision" mode="editorial_decision" run={run} busy={busy} relpath="editor/editor_decision.md" />;
+  if (step === 11) return <ResultsStep id={id} run={run} busy={busy} />;
   if (step === 12) return <ArtifactStep id={id} title="Revision Plan" mode="editorial_decision" run={run} busy={busy} relpath="editor/revision_plan.md" />;
   if (step === 13) return <ExportStep id={id} run={run} busy={busy} />;
   return null;
@@ -125,6 +126,7 @@ function UploadStep({ id, onChange, setMsg }: any) {
 
 function ArtifactStep({ id, title, mode, run, busy, relpath }: any) {
   const [content, setContent] = useState("");
+  const [raw, setRaw] = useState(false);
   function load() { api.artifact(id, relpath).then((r) => setContent(r.content)).catch((e) => setContent(String(e))); }
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);
   return (
@@ -132,11 +134,76 @@ function ArtifactStep({ id, title, mode, run, busy, relpath }: any) {
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-ieee-dark">{title}</h2>
         <div className="flex gap-2">
+          <button className="btn-ghost" onClick={() => setRaw(!raw)}>{raw ? "Rendered" : "Raw"}</button>
           <button className="btn-ghost" onClick={load}>Reload</button>
           <button className="btn-primary" disabled={busy} onClick={() => run(mode).then(load)}>Run {mode}</button>
         </div>
       </div>
-      <Mono text={content} />
+      {raw ? <Mono text={content} /> : <Markdown>{content}</Markdown>}
+    </div>
+  );
+}
+
+function decisionColor(d: string): string {
+  const x = (d || "").toLowerCase();
+  if (x.includes("accept")) return "bg-green-50 text-green-800 border-green-200";
+  if (x.includes("minor")) return "bg-lime-50 text-lime-800 border-lime-200";
+  if (x.includes("major")) return "bg-amber-50 text-amber-800 border-amber-200";
+  if (x.includes("desk") || x.includes("reject")) return "bg-red-50 text-red-800 border-red-200";
+  return "bg-slate-50 text-slate-700 border-slate-200";
+}
+
+function ResultsStep({ id, run, busy }: any) {
+  const [sum, setSum] = useState<any>(null);
+  const [editor, setEditor] = useState("");
+  function load() {
+    api.summary(id).then(setSum).catch(() => {});
+    api.artifact(id, "editor/editor_decision.md").then((r) => setEditor(r.content)).catch(() => setEditor(""));
+  }
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);
+  const reviewers = sum?.reviewers || [];
+  return (
+    <div className="space-y-4">
+      <div className="card space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-ieee-dark">Results — Editor decision</h2>
+          <div className="flex gap-2">
+            <button className="btn-ghost" onClick={load}>Reload</button>
+            <button className="btn-primary" disabled={busy} onClick={() => run("editorial_decision").then(load)}>Run editor</button>
+          </div>
+        </div>
+        <div className={`decision-banner ${decisionColor(sum?.editor?.decision)}`}>
+          Decision: {sum?.editor?.decision || "—"}
+          <span className="ml-2 text-xs font-normal">({sum?.editor?.engine} · {sum?.editor?.mode})</span>
+        </div>
+      </div>
+
+      <div className="card">
+        <h3 className="font-semibold text-slate-700 mb-2">Reviewer recommendations</h3>
+        <div className="table-wrap">
+          <table className="w-full">
+            <thead><tr><th className="th">Reviewer</th><th className="th">Engine / mode</th><th className="th">Recommendation</th></tr></thead>
+            <tbody>
+              {reviewers.map((r: any) => (
+                <tr key={r.name}>
+                  <td className="td"><div className="font-medium">{r.name}</div><div className="text-xs text-slate-400">{r.kind}</div></td>
+                  <td className="td"><span className={`badge ${r.is_real ? "" : "opacity-60"}`}>{r.engine} · {r.mode}</span></td>
+                  <td className="td text-sm">{r.recommendation}</td>
+                </tr>
+              ))}
+              {reviewers.length === 0 && (
+                <tr><td className="td text-slate-500" colSpan={3}>No reviewers yet — run step 9 (Autonomous Review).</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        {sum?.integrity && <p className="text-xs text-slate-500 mt-2">Integrity audit: {sum.integrity.engine} · {sum.integrity.mode}</p>}
+      </div>
+
+      <div className="card">
+        <h3 className="font-semibold text-slate-700 mb-2">Editor decision (full)</h3>
+        <Markdown>{editor}</Markdown>
+      </div>
     </div>
   );
 }
@@ -329,7 +396,7 @@ function ReviewStep({ id, run, busy }: any) {
             <li key={f}><button className={`text-left hover:underline ${sel === f ? "text-ieee font-medium" : "text-slate-600"}`} onClick={() => open(f)}>{f.replace("reviewer_outputs/", "")}</button></li>
           ))}
         </ul>
-        <div className="col-span-2"><Mono text={content} /></div>
+        <div className="col-span-2">{content ? <Markdown>{content}</Markdown> : <p className="text-xs text-slate-400">Select a reviewer to read it.</p>}</div>
       </div>
     </div>
   );

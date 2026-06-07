@@ -123,6 +123,15 @@ def get_artifact(review_id: str, relpath: str) -> dict:
         raise HTTPException(status_code=415, detail="Artifact is not text")
 
 
+@router.get("/{review_id}/summary")
+def review_summary(review_id: str) -> dict:
+    """Digest of each reviewer's recommendation + the editor's decision."""
+    if review_svc.get_review(review_id) is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    from worker.summary import review_summary as _summary
+    return _summary(review_id)
+
+
 @router.get("/{review_id}/tree")
 def list_artifacts(review_id: str) -> dict:
     """List markdown/json/yaml artifacts in the review tree for the UI."""
