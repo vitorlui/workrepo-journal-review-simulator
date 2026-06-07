@@ -88,8 +88,31 @@ CLI is missing/errors. Added prompt builders (`_integrity_prompt`, `_editor_prom
 reuse `build_execution_prompt`). 4 new tests (engine path used / fallback / editor / template
 default) → **36 pytest pass**. Updated STATE.md + CONTINUE.md.
 
+## 12. "Help button" + "run a+b, watch Playwright slowly, paper by paper"
+**Done:**
+- **Help button**: floating `?` with a step-by-step guided tour (auto-opens on first visit).
+  Commit `94b72f6`.
+- **(a) Pushed** `master` to `origin` (github.com/vitorlui/workrepo-journal-review-simulator).
+- **(b) Visible Playwright demo** over the user's real papers, paper by paper:
+  - The user's papers weren't attachable to the workspace; located them in `Downloads` and copied
+    `PAPER_A_dataset.pdf`, `PAPER_B_compag.pdf`, `PAPER_C_cosine.pdf` into `apps/web/e2e/papers/`
+    (the "Ángel" wheat paper was excluded per the user).
+  - Brought the stack up natively, ran `paper-runs.spec.ts` **headed + `PW_SLOWMO=700`** →
+    **3 passed**; each paper visibly: create review → upload → extract → classify → venues.
+  - Classification on the real PDFs looked right (A=data descriptor, B=benchmark/agri-food, C=survey).
+- **Gotchas solved (record for next time):**
+  1. **`:3000` was taken by OpenWebUI** → ran the web on **`:3001`** (`next dev -p 3001`).
+  2. **CORS**: API default allowed only `:3000`; the browser on `:3001` was blocked. Fixed live via
+     `CORS_ORIGINS`, and **permanently** with `allow_origin_regex` for any localhost port in `main.py`.
+  3. **Chromium download was AV-blocked** (download hit 100% but `chrome.exe` never extracted, leaving a
+     stale `__dirlock`). Worked around with **`PW_CHANNEL=msedge`** → use the installed Edge (config now
+     reads `PW_CHANNEL`). No browser download needed on Windows.
+  4. Playwright **strict-mode**: assertions must match one element (used `.first()` / specific roles).
+- 36 pytest still pass. The 3 demo reviews remain under `data/reviews/` (gitignored) — ready to run
+  the full reviewer/editor pipeline on, optionally with a real engine.
+
 ---
 
 ### Pending after this entry
-- Optional: `git push` (master ahead of origin by 4 after this commit).
-- Run Playwright E2E; do a real-engine full_review; see `CONTINUE.md`.
+- Commit entry-12 fixes (CORS regex, E2E assertions, `PW_CHANNEL`, this bitácora) + push.
+- Run a **full_review** (and a real-engine run) on the 3 ingested papers; see `CONTINUE.md`.

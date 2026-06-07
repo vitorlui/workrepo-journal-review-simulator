@@ -17,7 +17,7 @@ function listPapers(): string[] {
   try {
     return fs
       .readdirSync(PAPERS_DIR)
-      .filter((f) => /\.(pdf|docx|md|markdown|tex|zip)$/i.test(f))
+      .filter((f) => /\.(pdf|docx|md|markdown|tex|zip)$/i.test(f) && !/^readme/i.test(f))
       .map((f) => path.join(PAPERS_DIR, f));
   } catch {
     return [];
@@ -55,20 +55,20 @@ for (const paperPath of papers) {
     // Step 1 — upload the manuscript.
     await page.getByRole("button", { name: "1. Upload" }).click();
     await page.locator('input[type="file"]').setInputFiles(paperPath);
-    await expect(page.getByText(/"ok": true|Upload OK|sha256/)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText("Upload OK")).toBeVisible({ timeout: 15000 });
 
     // Step 2 — extraction.
     await page.getByRole("button", { name: "2. Extraction" }).click();
     await page.getByRole("button", { name: /Run extract/ }).click();
-    await expect(page.getByText(/Paper extraction|title/)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/Paper extraction/).first()).toBeVisible({ timeout: 20000 });
 
     // Step 3 — area & paper type.
     await page.getByRole("button", { name: "3. Area & Paper Type" }).click();
     await page.getByRole("button", { name: /Run classify/ }).click();
-    await expect(page.getByText(/Paper type|Detected areas/)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/Paper type/).first()).toBeVisible({ timeout: 20000 });
 
     // Step 4 — venues (just confirm the catalog renders).
     await page.getByRole("button", { name: "4. Venues" }).click();
-    await expect(page.getByText(/Discover candidates|Save selection/)).toBeVisible();
+    await expect(page.getByRole("button", { name: /Save selection/ })).toBeVisible();
   });
 }

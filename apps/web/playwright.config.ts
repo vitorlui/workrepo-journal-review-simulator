@@ -19,6 +19,9 @@ export default defineConfig({
     screenshot: "only-on-failure",
     // PW_SLOWMO=800 slows each action so you can watch the browser drive the UI.
     launchOptions: { slowMo: Number(process.env.PW_SLOWMO || 0) },
+    // PW_CHANNEL=msedge|chrome uses an installed browser instead of the bundled
+    // Chromium (handy on Windows where the Chromium download can be AV-blocked).
+    channel: process.env.PW_CHANNEL || undefined,
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });
