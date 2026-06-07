@@ -195,9 +195,49 @@ Supported engines (no API keys, no browser automation — they use the CLIs/plan
 | Ollama | `ollama run <model>` | local, free |
 
 Command templates are in `config/model_config.yaml` (`cli_engines`) and are adjustable without code
-changes. `GET /engine-status` reports which CLIs are installed. The CLIs must be installed and
-authenticated wherever the backend runs — **run the backend natively on your host** so it can reach
-them (in Docker they would need to be provisioned in the image). Perplexity is intentionally omitted.
+changes. `GET /engine-status` reports which CLIs are installed. Perplexity is intentionally omitted.
+
+### Host setup — run the CLIs from your own computer
+
+Because the backend launches the CLI as a subprocess, **run the backend natively on your host**
+(not in Docker — a container can't see host-installed CLIs or their cached logins).
+
+**1) Install + authenticate each CLI (one time).** These use the plans you already have — no API
+keys, no extra purchase:
+
+| Engine | Install | Authenticate | Cost |
+|---|---|---|---|
+| Claude | comes with Claude Code | already signed in | your Claude plan (e.g. Max) |
+| ChatGPT | `npm i -g @openai/codex` | run `codex`, *Sign in with ChatGPT* | your ChatGPT plan (e.g. Pro) |
+| Gemini | `npm i -g @google/gemini-cli` | run `gemini`, log in with Google | **free tier** (no Pro needed) |
+| Ollama | install Ollama, `ollama pull llama3.1` | n/a | local, free |
+
+(npm needs Node.js — `winget install OpenJS.NodeJS.LTS`. The npm global bin
+`%APPDATA%\npm` must be on PATH; open a new terminal after installing.)
+
+**2) Start the backend natively** (SQLite fallback, no Docker/Postgres needed):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\dev_native.ps1
+# prints which engine CLIs are detected, then serves the API on http://localhost:8000
+```
+
+**3) Use it — two ways:**
+
+- **With the web UI:** in another terminal `cd apps\web; npm install; npm run dev` → open
+  http://localhost:3000 → a review → step **7. External Prompts** → pick venue + reviewer + engine →
+  **Execute query**. The engine dropdown disables CLIs that aren't installed.
+- **Without any frontend** (quick check):
+  ```powershell
+  python scripts\run_query.py --status      # list detected engines
+  python scripts\run_query.py --review-id <id> --venue <venue_id> --reviewer reviewer-methodology --engine codex
+  ```
+
+The response is saved as an indexed external response under
+`data/reviews/<id>/external_responses/by_venue/<venue_id>/` and appears in the responses index.
+
+> Note: queries consume each plan's **included** usage (Claude Max / ChatGPT Pro / Gemini free
+> tier) — nothing extra to buy.
 
 E2E tests for the UI live in `apps/web/e2e/` (Playwright) — see that folder's README.
 
