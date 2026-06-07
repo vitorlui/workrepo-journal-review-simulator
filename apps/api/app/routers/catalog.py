@@ -41,6 +41,14 @@ def ai_engines() -> dict:
     }
 
 
+@router.get("/engine-status")
+def engine_status() -> dict:
+    """Which CLI engines are installed/available for the Execute-query button."""
+    from worker.engines import engine_status as status
+    from worker.engines import query_engines
+    return {"engines": status(), "query_engines": query_engines()}
+
+
 @router.get("/dashboard")
 def dashboard() -> dict:
     reviews = review_svc.list_reviews()

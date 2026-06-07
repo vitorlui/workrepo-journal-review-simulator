@@ -173,6 +173,28 @@ Markdown output structure:
 """
 
 
+def build_execution_prompt(review_id: str, venue_id: str, profile_id: str, engine: str) -> str:
+    """Return the prompt text to feed an engine CLI for one venue×reviewer.
+
+    Used by the Execute-query button. If a prompt file was already generated it
+    is reused; otherwise it is built on the fly.
+    """
+    n = _reviewer_index(profile_id)
+    existing = (review_dir(review_id) / "external_prompts" / "by_venue" / venue_id
+                / f"rev{n}_{profile_id}_{engine}_prompt.md")
+    if existing.exists():
+        return read_text(existing)
+    base = venues_dir() / "journals" / venue_id
+    venue_profile = read_yaml(base / "venue_profile.yaml") if base.exists() else {}
+    expected = f"{review_id}__{venue_id}__rev{n}_{profile_id}_{engine}_response.md"
+    return _prompt_body(
+        review_id=review_id, venue_id=venue_id, venue_name=venue_profile.get("name", venue_id),
+        profile_id=profile_id, engine=engine, expected_filename=expected,
+        reviewer_profile_text=_load_reviewer_profile_text(profile_id),
+        venue_block=_load_venue_block(venue_id), paper_summary=_load_paper_summary(review_id),
+    )
+
+
 def generate_prompts(
     review_id: str,
     venue_ids: list[str],

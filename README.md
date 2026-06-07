@@ -179,6 +179,28 @@ Export (**Step 13** or `python scripts/export_review_package.py --review-id <id>
 `python scripts/compare_models.py --review-id <id> --provider ollama --model llama3.1`
 writes comparison scaffolds to `reviewer_outputs/model_comparison/`.
 
+## 16b. Run queries via engine CLI (Execute-query button)
+
+Instead of manually copy-pasting prompts into LLM web UIs, the **External Prompts** step has an
+**Execute query** control: pick a venue, reviewer and engine, and a worker runs that engine's
+**local CLI** with the generated prompt and saves the output as an external response.
+
+Supported engines (no API keys, no browser automation — they use the CLIs/plans you already have):
+
+| Engine | CLI | Auth / cost |
+|---|---|---|
+| Claude | `claude -p` (Claude Code) | your Claude plan (e.g. Max) |
+| ChatGPT | `codex exec` (OpenAI Codex CLI) | sign in with your ChatGPT plan (e.g. Pro) |
+| Gemini | `gemini -p` (Gemini CLI) | free tier with a Google login |
+| Ollama | `ollama run <model>` | local, free |
+
+Command templates are in `config/model_config.yaml` (`cli_engines`) and are adjustable without code
+changes. `GET /engine-status` reports which CLIs are installed. The CLIs must be installed and
+authenticated wherever the backend runs — **run the backend natively on your host** so it can reach
+them (in Docker they would need to be provisioned in the image). Perplexity is intentionally omitted.
+
+E2E tests for the UI live in `apps/web/e2e/` (Playwright) — see that folder's README.
+
 ## 17. View history
 
 Sidebar → *Export / History* lists every review with download links; or browse `data/reviews/`.

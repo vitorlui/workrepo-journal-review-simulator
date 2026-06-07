@@ -44,6 +44,9 @@ export const api = {
 
   reviewerProfiles: () => jfetch<any>("/reviewer-profiles"),
   aiEngines: () => jfetch<any>("/ai-engines"),
+  engineStatus: () => jfetch<any>("/engine-status"),
+  runQuery: (id: string, body: { venue_id: string; reviewer_profile: string; engine: string }) =>
+    jfetch<any>(`/reviews/${id}/run-query`, { method: "POST", body: JSON.stringify(body) }),
   vdReports: () => jfetch<any>("/venue-discovery/reports"),
   vdReport: (name: string) => jfetch<any>(`/venue-discovery/reports/${encodeURIComponent(name)}`),
   vdImportRawDir: () => jfetch<any>("/venue-discovery/import-raw-dir", { method: "POST" }),

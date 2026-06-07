@@ -85,7 +85,7 @@ function StepPanel({ id, step, review, run, busy, onChange, setMsg }: any) {
   if (step === 4) return <VenuesStep id={id} review={review} run={run} busy={busy} setMsg={setMsg} />;
   if (step === 5) return <ArtifactStep id={id} title="Desk-Reject Precheck" mode="desk_reject_precheck" run={run} busy={busy} relpath="venues/desk_reject_precheck.md" />;
   if (step === 6) return <ReviewerProfilesStep />;
-  if (step === 7) return <PromptsStep id={id} run={run} busy={busy} />;
+  if (step === 7) return <PromptsStep id={id} review={review} run={run} busy={busy} setMsg={setMsg} />;
   if (step === 8) return <ResponsesStep id={id} setMsg={setMsg} />;
   if (step === 9) return <ReviewStep id={id} run={run} busy={busy} />;
   if (step === 10) return <ArtifactStep id={id} title="Integrity Audit" mode="integrity" run={run} busy={busy} relpath="reviewer_outputs/integrity_ai_use_audit.md" />;
@@ -210,17 +210,78 @@ function ReviewerProfilesStep() {
   );
 }
 
-function PromptsStep({ id, run, busy }: any) {
+function PromptsStep({ id, review, run, busy, setMsg }: any) {
   const [content, setContent] = useState("");
+  const [profiles, setProfiles] = useState<string[]>([]);
+  const [status, setStatus] = useState<any>({ engines: {}, query_engines: [] });
+  const [venue, setVenue] = useState("");
+  const [profile, setProfile] = useState("");
+  const [engine, setEngine] = useState("");
+  const [running, setRunning] = useState(false);
+  const [preview, setPreview] = useState("");
+
+  const selectedVenues: string[] = review?.metadata?.selected_venues || [];
+
   function load() { api.externalPrompts(id).then((r) => setContent(r.index)).catch((e) => setContent(String(e))); }
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [id]);
+  useEffect(() => {
+    load();
+    api.reviewerProfiles().then((r) => {
+      const all = [...r.main_reviewers, ...r.specialized_reviewers].map((p: any) => p.id);
+      setProfiles(all); setProfile(all[0] || "");
+    }).catch(() => {});
+    api.engineStatus().then((s) => {
+      setStatus(s);
+      const firstAvail = (s.query_engines || []).find((e: string) => s.engines?.[e]?.available);
+      setEngine(firstAvail || s.query_engines?.[0] || "");
+    }).catch(() => {});
+    // eslint-disable-next-line
+  }, [id]);
+  useEffect(() => { if (selectedVenues.length && !venue) setVenue(selectedVenues[0]); }, [selectedVenues, venue]);
+
+  async function execute() {
+    if (!venue || !profile || !engine) { setMsg("Pick venue, reviewer and engine first."); return; }
+    setRunning(true); setPreview(""); setMsg(`Running ${engine} CLI...`);
+    try {
+      const r = await api.runQuery(id, { venue_id: venue, reviewer_profile: profile, engine });
+      setPreview(r.error ? `ERROR: ${r.error}` : r.preview);
+      setMsg(r.ok ? `Saved: ${r.stored_path}` : `Engine error: ${r.error}`);
+      load();
+    } catch (e) { setMsg(String(e)); }
+    setRunning(false);
+  }
+
   return (
     <div className="card space-y-3">
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-ieee-dark">External Prompts</h2>
-        <button className="btn-primary" disabled={busy} onClick={() => run("generate_external_prompts").then(load)}>Generate prompts</button>
+        <button className="btn-ghost" disabled={busy} onClick={() => run("generate_external_prompts").then(load)}>Generate prompts</button>
       </div>
-      <p className="text-xs text-slate-500">Generates prompts per selected venue × reviewer × engine (ChatGPT, Claude, Gemini, Perplexity, NotebookLM).</p>
+      <p className="text-xs text-slate-500">Generate prompts per selected venue × reviewer × engine, or run a query directly via the engine CLI (Claude / Codex / Ollama / Gemini).</p>
+
+      <div className="rounded-md border border-ieee-light bg-ieee-light/40 p-3 space-y-2">
+        <div className="text-sm font-semibold text-ieee-dark">Execute query (engine CLI)</div>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+          <select className="input" value={venue} onChange={(e) => setVenue(e.target.value)}>
+            <option value="">venue…</option>
+            {(selectedVenues.length ? selectedVenues : [venue].filter(Boolean)).map((v) => <option key={v} value={v}>{v}</option>)}
+          </select>
+          <select className="input" value={profile} onChange={(e) => setProfile(e.target.value)}>
+            {profiles.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+          <select className="input" value={engine} onChange={(e) => setEngine(e.target.value)}>
+            {(status.query_engines || []).map((e: string) => {
+              const av = status.engines?.[e]?.available;
+              return <option key={e} value={e} disabled={!av}>{e}{av ? "" : " (not installed)"}</option>;
+            })}
+          </select>
+          <button className="btn-primary justify-center" disabled={running} onClick={execute}>
+            {running ? "Running…" : "Execute query"}
+          </button>
+        </div>
+        {selectedVenues.length === 0 && <p className="text-xs text-amber-600">Tip: select venues in Step 4 first.</p>}
+        {preview && <Mono text={preview} />}
+      </div>
+
       <Mono text={content} />
     </div>
   );

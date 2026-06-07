@@ -29,6 +29,39 @@ engines:
     default_model: llama3.1
     enabled: false
 
+# CLI engines for the "Execute query" button: a worker runs the local CLI of
+# each tool with our generated prompt and captures stdout (no browser, no keys).
+# Flags are adjustable here without code changes. pass_via: stdin | arg.
+# NOTE: the CLIs must be installed and on PATH wherever the backend runs (native
+# host recommended; in Docker they would need to be provisioned in the image).
+cli_engines:
+  ollama:
+    bin: ollama
+    cmd: ["ollama", "run", "{model}"]
+    model_env: OLLAMA_MODEL
+    default_model: llama3.1
+    pass_via: stdin
+    timeout: 300
+  claude:
+    bin: claude
+    cmd: ["claude", "-p"]      # Claude Code non-interactive print mode
+    pass_via: stdin
+    timeout: 600
+  codex:
+    bin: codex
+    cmd: ["codex", "exec"]     # OpenAI Codex CLI (ChatGPT) non-interactive
+    pass_via: arg
+    timeout: 600
+  gemini:
+    bin: gemini
+    cmd: ["gemini", "-p"]      # Google Gemini CLI
+    pass_via: arg
+    timeout: 600
+  # perplexity: intentionally omitted for now (no CLI / tokens exhausted)
+
+# Engines offered by the "Execute query" UI button, in order.
+query_engines: [claude, codex, ollama, gemini]
+
 # Comparison runs (scripts/compare_models.py) write to
 # data/reviews/<review_id>/reviewer_outputs/model_comparison/
 comparison:

@@ -4,12 +4,20 @@ from __future__ import annotations
 import json
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
+from pydantic import BaseModel
 
 from worker import reviews as review_svc
 from worker.external_responses import import_response
 from worker.paths import review_dir
+from worker.run_query import execute_query
 
 router = APIRouter(prefix="/reviews", tags=["external"])
+
+
+class RunQueryIn(BaseModel):
+    venue_id: str
+    reviewer_profile: str
+    engine: str  # claude | codex | ollama | gemini
 
 
 @router.get("/{review_id}/external-prompts")
@@ -35,6 +43,14 @@ async def upload_response(review_id: str, file: UploadFile = File(...)) -> dict:
         "looks_incomplete": res.looks_incomplete,
         "warnings": res.warnings,
     }
+
+
+@router.post("/{review_id}/run-query")
+def run_query(review_id: str, body: RunQueryIn) -> dict:
+    """Run the generated prompt through an engine CLI and save the response."""
+    if review_svc.get_review(review_id) is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return execute_query(review_id, body.venue_id, body.reviewer_profile, body.engine)
 
 
 @router.get("/{review_id}/external-responses")
